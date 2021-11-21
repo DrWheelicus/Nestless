@@ -5,12 +5,12 @@ The final project for CSCI 4100U requires you to create a smart phone app using 
 * Project Proposal
 * Project Development
 
-All of the groups have alread submitted their project proposals so you should be in the phase of development now. Please note that your project should adhere to the requirements you have committed in your project proposal. You are free to add extra features but missing a requirement might result in loss of marks.
+All of the groups have already submitted their project proposals so you should be in the phase of development now. Please note that your project should adhere to the requirements you have committed in your project proposal. You are free to add extra features but missing a requirement might result in loss of marks.
 
 ## Instructions
 You are required to work on this project in groups of 5 people or less. Make sure there is a focal person (Team Lead) in the group who will be responsible for managing the project along with contributing towards his/her part in the project. 
 
-Team Lead would be responsible for submission of the project as well. Please note that only Team Lead will submit the final project (not every member of the group is required to make submission of the project). 
+Team Lead is responsible for the submission of the project as well. Please note that only Team Lead will submit the final project (not every member of the group is required to submit the project). 
 
 ### Submission
 Team Lead is expected to make the submission of the final project through Github, exactly how you have been submitting your labs.  Please make sure to take appropriate screenshots of all the screens and actions you deem necessary and place them in a separate folder inside your project. You can call this folder `Screenshots`. The deadline for submission of the project is **December 5, 2021**.
