@@ -1,53 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:nestless/utils/config.dart';
+import 'package:nestless/views/login_page.dart';
 
-void main() {
+void main() async {
+  await Hive.initFlutter();
+  box = await Hive.openBox("Nestless");
   runApp(const MainApp());
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   const MainApp({Key? key}) : super(key: key);
+
+  @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+  @override
+  void initState() {
+    super.initState();
+    setTheme.addListener(() {
+      print("Theme Change Detected");
+      setState(() {});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter App',
+      title: 'Nestless',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        brightness: Brightness.light,
+        primarySwatch: Colors.lightGreen,
       ),
-      home: const HomePage(title: 'Home Page'),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        primarySwatch: Colors.lightGreen,
+        primaryColor: Colors.deepPurple[300],
+      ),
+      themeMode: setTheme.setTheme(),
+      home: LoginPage(
+        title: "LOGIN",
+      ),
     );
-  }
-}
-
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
-        body: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Icon(
-                Icons.check,
-                color: Colors.green,
-                size: 35,
-              ),
-              SizedBox(width: 10),
-              Text("App created successfully!")
-            ],
-          ),
-        ));
   }
 }
