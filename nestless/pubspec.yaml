@@ -1,5 +1,5 @@
 name: nestless
-description: A new Flutter project.
+description: The bird tracking app
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -31,16 +31,40 @@ dependencies:
     sdk: flutter
   
   hive: ^2.0.4
+  hive_flutter: ^1.1.0
 
+  simple_animations: ^4.0.1
+  rive_splash_screen: ^0.1.0
+  flutter_launcher_icons: ^0.9.2
+  # introduction_screen: ^2.1.0
+
+  glass_kit: ^2.0.1
+  flutter_animated_button: ^2.0.0
+  nice_buttons: ^0.0.2
+  advance_notification: ^1.0.5
+  google_fonts: ^2.1.0
+  animated_text_kit: ^4.2.1
+
+  supercharged: ^2.1.1
+
+  firebase_auth: ^3.2.0
+  firebase_core: ^1.10.0
+  cloud_firestore: ^3.1.0
+  firebase_analytics: ^8.3.4
+  firebase_dynamic_links: ^3.0.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  hive_flutter: ^1.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logo.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -62,9 +86,11 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/day.jpg
+    - assets/images/one.png
+    - assets/images/day.gif
     - assets/images/night.gif
     - assets/images/night2.gif
+    - assets/animations/feather.riv
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
@@ -78,17 +104,6 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: Let It Flow
-      fonts:
-        - asset: assets/fonts/Let_It_Flow.otf
-          style: normal
-
-    - family: Nature Spirit
-      fonts:
-        - asset: assets/fonts/NatureSpiritRegular.otf
-          style: normal
-        - asset: assets/fonts/NatureSpiritRough.otf
-
     - family: Abraham
       fonts:
         - asset: assets/fonts/abraham_regular.otf

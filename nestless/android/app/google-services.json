@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1044175618862",
+    "project_id": "nestless-2e3fe",
+    "storage_bucket": "nestless-2e3fe.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1044175618862:android:96ccb50f1bee8f059930bf",
+        "android_client_info": {
+          "package_name": "com.example.nestless"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1044175618862-k73f4rjfqhilvnu6e893q2hfir1hn58m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.nestless",
+            "certificate_hash": "9164d8121828de854aea7d2cccab530e3c0b3ef6"
+          }
+        },
+        {
+          "client_id": "1044175618862-7t25kts659hcmgr2efkmlemv7scee9vv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAstYTd7tAF-YlUkp8z9gBx31jLLDKQvJc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1044175618862-7t25kts659hcmgr2efkmlemv7scee9vv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
