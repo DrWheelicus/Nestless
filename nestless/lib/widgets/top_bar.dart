@@ -1,23 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:nestless/utils/config.dart';
+import 'package:nestless/services/authentication.dart';
+import 'package:nestless/widgets/sign_out_button.dart';
 
 class TopBar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
   final bool hasTitle;
+  final bool isCenterTitle;
   final bool hasBack;
+  final bool hasSignOut;
   final bool hasThemeToggle;
-  final List<IconButton> actions;
+  final List<Widget> actions;
+  final double opacity;
 
   final AppBar appBar;
+
+  final BaseAuth auth;
+  final VoidCallback onSignOut;
 
   const TopBar(
       {Key? key,
       required this.title,
       this.hasBack = true,
+      this.hasSignOut = false,
       this.hasThemeToggle = true,
       this.hasTitle = true,
+      this.isCenterTitle = false,
       required this.appBar,
-      this.actions = const []})
+      required this.auth,
+      required this.onSignOut,
+      this.actions = const [],
+      this.opacity = 1.0})
       : super(key: key);
 
   @override
@@ -28,12 +40,10 @@ class TopBar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _TopBarState extends State<TopBar> {
-  final bool _isDarkMode = false;
-
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white.withOpacity(widget.opacity),
       elevation: 0.0,
       automaticallyImplyLeading: widget.hasBack,
       iconTheme: IconThemeData(
@@ -50,24 +60,13 @@ class _TopBarState extends State<TopBar> {
               ),
             )
           : null,
-      centerTitle: true,
+      centerTitle: widget.isCenterTitle,
       actionsIconTheme: IconThemeData(
         color: Theme.of(context).primaryColor,
-        opacity: 1.0,
       ),
-      actions: widget.hasThemeToggle
-          ? [
-                IconButton(
-                  icon: _isDarkMode
-                      ? const Icon(Icons.wb_sunny)
-                      : const Icon(Icons.brightness_3_rounded),
-                  tooltip: 'Toggle Theme',
-                  onPressed: () {
-                    setState(() {
-                      setTheme.toggleTheme();
-                    });
-                  },
-                )
+      actions: widget.hasSignOut
+          ? <Widget>[
+                SignOutButton(auth: widget.auth, onSignedOut: widget.onSignOut),
               ] +
               widget.actions
           : widget.actions,
