@@ -157,8 +157,9 @@ class _LoginSignupDialogState extends State<LoginSignupDialog>
                   ? widget.isLinkLogin
                       // * NOTE: Need to change this every time the login dialog
                       // * is added to
-                      ? MediaQuery.of(context).size.height * 0.45
-                      : MediaQuery.of(context).size.height * 0.625
+                      ? MediaQuery.of(context).size.height * 0.4
+                      : MediaQuery.of(context).size.height *
+                          0.55 // ! DO NOT CHANGE
                   : MediaQuery.of(context).size.height * 0.5,
               width: MediaQuery.of(context).size.width,
               elevation: 10,
@@ -417,7 +418,7 @@ class _LoginSignupDialogState extends State<LoginSignupDialog>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 2),
                   widget.isLogin
                       ? Column(children: [
                           // Google sign in button
@@ -448,7 +449,7 @@ class _LoginSignupDialogState extends State<LoginSignupDialog>
                               ? Container()
                               : Column(
                                   children: [
-                                    const SizedBox(height: 20),
+                                    const SizedBox(height: 2),
                                     ElevatedButton.icon(
                                       onPressed: () {
                                         Navigator.push(
@@ -466,7 +467,8 @@ class _LoginSignupDialogState extends State<LoginSignupDialog>
                                                 )));
                                       },
                                       icon: const Icon(
-                                          Icons.attach_email_rounded),
+                                        Icons.link,
+                                      ),
                                       label: const Text("Passwordless Sign In"),
                                       style: ButtonStyle(
                                         backgroundColor:
