@@ -180,6 +180,7 @@ class _StartPageState extends State<StartPage> {
                                     onSignedIn: loginCallback,
                                     onSignedOut: logoutCallback,
                                     userId: _UID,
+                                    isLinkLogin: false,
                                   ),
                                 ),
                               );
@@ -190,6 +191,7 @@ class _StartPageState extends State<StartPage> {
                                   builder: (context) => HomePage(
                                     auth: widget.auth,
                                     onSignedOut: logoutCallback,
+                                    onSignedIn: loginCallback,
                                     userId: _UID,
                                   ),
                                 ),
