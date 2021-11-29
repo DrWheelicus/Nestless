@@ -15,7 +15,9 @@ class TopBar extends StatefulWidget implements PreferredSizeWidget {
   final AppBar appBar;
 
   final BaseAuth auth;
+  final VoidCallback onSignIn;
   final VoidCallback onSignOut;
+  final String userId;
 
   const TopBar(
       {Key? key,
@@ -29,7 +31,9 @@ class TopBar extends StatefulWidget implements PreferredSizeWidget {
       required this.auth,
       required this.onSignOut,
       this.actions = const [],
-      this.opacity = 1.0})
+      this.opacity = 1.0,
+      required this.userId,
+      required this.onSignIn})
       : super(key: key);
 
   @override
@@ -66,7 +70,11 @@ class _TopBarState extends State<TopBar> {
       ),
       actions: widget.hasSignOut
           ? <Widget>[
-                SignOutButton(auth: widget.auth, onSignedOut: widget.onSignOut),
+                SignOutButton(
+                    auth: widget.auth,
+                    onSignedOut: widget.onSignOut,
+                    userId: widget.userId,
+                    onSignedIn: widget.onSignIn),
               ] +
               widget.actions
           : widget.actions,

@@ -2,12 +2,21 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:nestless/services/authentication.dart';
+import 'package:nestless/views/login_page.dart';
+import 'package:page_transition/page_transition.dart';
 
 class SignOutButton extends StatefulWidget {
   final BaseAuth auth;
+  final VoidCallback onSignedIn;
   final VoidCallback onSignedOut;
+  final String userId;
 
-  const SignOutButton({Key? key, required this.auth, required this.onSignedOut})
+  const SignOutButton(
+      {Key? key,
+      required this.auth,
+      required this.onSignedOut,
+      required this.userId,
+      required this.onSignedIn})
       : super(key: key);
 
   @override
@@ -29,6 +38,17 @@ class _SignOutButtonState extends State<SignOutButton> {
     return ElevatedButton.icon(
       onPressed: () {
         _signOut();
+        Navigator.push(
+            context,
+            PageTransition(
+                type: PageTransitionType.topToBottom,
+                child: LoginPage(
+                    title: 'LOGIN',
+                    auth: widget.auth,
+                    onSignedOut: widget.onSignedOut,
+                    isLinkLogin: false,
+                    userId: widget.userId,
+                    onSignedIn: widget.onSignedIn)));
       },
       icon: const Icon(Icons.exit_to_app, color: Colors.white),
       label: const Text(
