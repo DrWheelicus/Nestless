@@ -24,6 +24,7 @@ class SignOutButton extends StatefulWidget {
 }
 
 class _SignOutButtonState extends State<SignOutButton> {
+  // Sign out the user
   _signOut() async {
     try {
       await widget.auth.signOut();
@@ -37,7 +38,9 @@ class _SignOutButtonState extends State<SignOutButton> {
   Widget build(BuildContext context) {
     return ElevatedButton.icon(
       onPressed: () {
+        // Sign out the user
         _signOut();
+        // Navigate to the login page
         Navigator.push(
             context,
             PageTransition(

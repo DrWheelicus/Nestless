@@ -34,6 +34,8 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     var brightness = Theme.of(context).brightness;
     isDark = brightness == Brightness.dark;
+
+    // Set background image
     backgroundImage = isDark
         ? const Image(
             image: AssetImage('assets/images/night2.gif'),
@@ -61,6 +63,7 @@ class _SignUpPageState extends State<SignUpPage> {
           hasThemeToggle: false,
           opacity: 0.4,
         ),
+        // Show signup dialog
         body: LoginSignupDialog(
           auth: widget.auth,
           onSignedIn: widget.onSignedIn,

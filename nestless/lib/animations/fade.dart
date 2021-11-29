@@ -13,6 +13,7 @@ class FadeAnimation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Create a tween to animate the widget's opacity and position
     final tween = MultiTween<AniProps>()
       ..add(AniProps.opacity, 0.0.tweenTo(1.0), 500.milliseconds)
       ..add(AniProps.translateY, (-30.0).tweenTo(0.0), 500.milliseconds,
@@ -23,6 +24,8 @@ class FadeAnimation extends StatelessWidget {
       duration: tween.duration,
       tween: tween,
       child: child,
+      // By default, the tween is played forwards, so the widget will fade in
+      // and move down.
       builder: (context, child, value) => Opacity(
         opacity: value.get(AniProps.opacity),
         child: Transform.translate(

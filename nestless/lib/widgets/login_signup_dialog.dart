@@ -41,6 +41,7 @@ class _LoginSignupDialogState extends State<LoginSignupDialog>
     with WidgetsBindingObserver {
   late bool isDark;
 
+  // Initialize form field controllers
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -50,9 +51,11 @@ class _LoginSignupDialogState extends State<LoginSignupDialog>
   @override
   void initState() {
     super.initState();
+    // Check for link login
     WidgetsBinding.instance!.addObserver(this);
   }
 
+  // Clean up controllers when done
   @override
   void dispose() {
     _emailController.dispose();
@@ -61,46 +64,58 @@ class _LoginSignupDialogState extends State<LoginSignupDialog>
     super.dispose();
   }
 
+  // Detect when app is in the background and open link
+  // ! Not working
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed) {
-      final PendingDynamicLinkData? data =
-          await FirebaseDynamicLinks.instance.getInitialLink();
-      if (data?.link != null) {
-        handleLink(data!.link);
-      }
+    try {
       FirebaseDynamicLinks.instance.onLink(
           onSuccess: (PendingDynamicLinkData? dynamicLink) async {
-        final Uri deepLink = dynamicLink!.link;
-        handleLink(deepLink);
+        final Uri? deepLink = dynamicLink?.link;
+        if (deepLink != null) {
+          handleLink(deepLink, _emailController.text);
+          FirebaseDynamicLinks.instance.onLink(
+              onSuccess: (PendingDynamicLinkData? dynamicLink) async {
+            final Uri? deepLink = dynamicLink!.link;
+            handleLink(deepLink!, _emailController.text);
+          }, onError: (OnLinkErrorException e) async {
+            log(e.message.toString());
+          });
+          // Navigator.pushNamed(context, deepLink.path);
+        }
       }, onError: (OnLinkErrorException e) async {
-        log('onLinkError');
         log(e.message.toString());
       });
+
+      final PendingDynamicLinkData? data =
+          await FirebaseDynamicLinks.instance.getInitialLink();
+      final Uri? deepLink = data?.link;
+
+      if (deepLink != null) {
+        log(deepLink.userInfo);
+      }
+    } catch (e) {
+      log(e.toString());
     }
   }
 
-  void handleLink(Uri link) async {
-    if (link.userInfo.isNotEmpty) {
-      final User user = await widget.auth
-          .signInWithLink(_emailController.text, link.toString());
+  // Handle dynamic link
+  void handleLink(Uri link, userEmail) async {
+    // ignore: unnecessary_null_comparison
+    if (link != null) {
+      log(userEmail);
+      final UserCredential user =
+          await FirebaseAuth.instance.signInWithEmailLink(
+        email: userEmail,
+        emailLink: link.toString(),
+      );
       // ignore: unnecessary_null_comparison
       if (user != null) {
-        setState(() {
-          widget.userId = user.uid;
-          _success = true;
-        });
-      } else {
-        setState(() {
-          _success = false;
-        });
+        log(user.credential.toString());
       }
     } else {
-      setState(() {
-        _success = false;
-      });
+      log("link is null");
     }
-    setState(() {});
   }
 
   @override
@@ -140,6 +155,8 @@ class _LoginSignupDialogState extends State<LoginSignupDialog>
               ),
               height: widget.isLogin
                   ? widget.isLinkLogin
+                      // * NOTE: Need to change this every time the login dialog
+                      // * is added to
                       ? MediaQuery.of(context).size.height * 0.45
                       : MediaQuery.of(context).size.height * 0.625
                   : MediaQuery.of(context).size.height * 0.5,
@@ -147,7 +164,9 @@ class _LoginSignupDialogState extends State<LoginSignupDialog>
               elevation: 10,
               padding: const EdgeInsets.fromLTRB(30, 35, 30, 10),
               borderRadius: BorderRadius.circular(20),
-              blur: isDark ? 10 : 20,
+              blur: isDark ? 10 : 20, // Put a blur on the background
+              // More blur = more expensive so use less
+              // when possible
               child: Column(
                 children: <Widget>[
                   Form(
@@ -158,7 +177,11 @@ class _LoginSignupDialogState extends State<LoginSignupDialog>
                                 FadeAnimation(
                                   1.4,
                                   TextFormField(
+                                    // Assign the controller to the text field
                                     controller: _emailController,
+                                    // Set the keyboard type so the user can
+                                    // enter their email more easily
+                                    // * Accessibility option
                                     keyboardType: TextInputType.emailAddress,
                                     decoration: InputDecoration(
                                       labelText: "Email",
@@ -179,7 +202,11 @@ class _LoginSignupDialogState extends State<LoginSignupDialog>
                                 FadeAnimation(
                                   1.4,
                                   TextFormField(
+                                    // Assign the controller to the text field
                                     controller: _emailController,
+                                    // Set the keyboard type so the user can
+                                    // enter their email more easily
+                                    // * Accessibility option
                                     keyboardType: TextInputType.emailAddress,
                                     decoration: InputDecoration(
                                       labelText: "Email",
@@ -198,7 +225,10 @@ class _LoginSignupDialogState extends State<LoginSignupDialog>
                                   Padding(
                                     padding: const EdgeInsets.only(top: 10),
                                     child: TextFormField(
+                                      // Assign the controller to the text field
                                       controller: _passwordController,
+                                      // Hide the password to make it more seem
+                                      // secure
                                       obscureText: true,
                                       decoration: InputDecoration(
                                         labelText: "Password",
@@ -220,6 +250,8 @@ class _LoginSignupDialogState extends State<LoginSignupDialog>
                   FadeAnimation(
                       1.5,
                       AnimatedButton(
+                        // Set the button text based on whether the user is
+                        // logging in or signing up
                         text: widget.isLogin ? "LOGIN" : "SIGN UP",
                         textStyle: const TextStyle(
                           color: Colors.white,
@@ -238,9 +270,12 @@ class _LoginSignupDialogState extends State<LoginSignupDialog>
                         onPress: () {
                           String userId = "";
 
+                          // Check if the form is valid
                           if (_formKey.currentState!.validate() &&
                               !widget.isLinkLogin) {
+                            // Check if the user is logging in or signing up
                             widget.isLogin
+                                // If the user is logging in, log them in (obviously)
                                 ? widget.auth
                                     .signIn(_emailController.text,
                                         _passwordController.text)
@@ -250,9 +285,22 @@ class _LoginSignupDialogState extends State<LoginSignupDialog>
                                       widget.onSignedIn();
                                       _success = true;
                                       _userEmail = user.email;
+                                      widget.userId = user.uid;
+                                      // Navigate to the home page
+                                      Navigator.push(
+                                          context,
+                                          PageTransition(
+                                              child: HomePage(
+                                                userId: userId,
+                                                auth: widget.auth,
+                                                onSignedOut: widget.onSignedOut,
+                                                onSignedIn: widget.onSignedIn,
+                                              ),
+                                              type: PageTransitionType.fade));
                                     } else {
                                       _success = false;
                                       // TODO: Change this to a personalized snackbar
+                                      // * Should be a more user friendly error message
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         SnackBar(
@@ -270,6 +318,7 @@ class _LoginSignupDialogState extends State<LoginSignupDialog>
                                       );
                                     }
                                   })
+                                // If the user is signing up, sign them up (obviously)
                                 : widget.auth
                                     .signUp(_emailController.text,
                                         _passwordController.text)
@@ -280,6 +329,7 @@ class _LoginSignupDialogState extends State<LoginSignupDialog>
                                         widget.onSignedIn();
                                         _success = true;
                                         _userEmail = user.email;
+                                        // Navigate to the home page
                                         Navigator.push(
                                             context,
                                             PageTransition(
@@ -299,10 +349,10 @@ class _LoginSignupDialogState extends State<LoginSignupDialog>
                                   );
                           } else if (_formKey.currentState!.validate() &&
                               widget.isLinkLogin) {
+                            // Email link login
                             widget.auth.sendSignInLink(_emailController.text);
                             widget.onSignedIn();
                             _success = true;
-                            setState(() {});
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
@@ -370,8 +420,10 @@ class _LoginSignupDialogState extends State<LoginSignupDialog>
                   const SizedBox(height: 20),
                   widget.isLogin
                       ? Column(children: [
+                          // Google sign in button
                           SignInButton(Buttons.GoogleDark,
                               text: "Sign in with Google", onPressed: () {
+                            // Initialize the google sign in
                             widget.auth.signInWithGoogle().then((user) {
                               if (user.uid.isNotEmpty) {
                                 widget.onSignedIn();

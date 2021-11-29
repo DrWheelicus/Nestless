@@ -39,8 +39,11 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Get the theme from the context
     var brightness = Theme.of(context).brightness;
     isDark = brightness == Brightness.dark;
+
+    // Set the background image
     backgroundImage = isDark
         ? const Image(
             image: AssetImage('assets/images/night.gif'),
@@ -52,6 +55,7 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
+          // Set the proper image
           image: backgroundImage.image,
           fit: BoxFit.cover,
         ),
@@ -75,12 +79,15 @@ class _LoginPageState extends State<LoginPage> {
             onSignedIn: widget.onSignedIn,
             onSignedOut: widget.onSignedOut,
             userId: widget.userId,
+            // ! Always initially set to false
             isLinkLogin: widget.isLinkLogin,
           ),
           floatingActionButton: const FadeAnimation(1.5, ThemeSwitch())),
     );
   }
 
+  // Clean up the controller when the widget is disposed
+  // (e.g. when the route is popped or the app is closed)
   @override
   void dispose() {
     _emailController.dispose();

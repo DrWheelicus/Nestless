@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:nestless/services/authentication.dart';
 import 'package:nestless/widgets/top_bar.dart';
 
@@ -22,43 +25,47 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  List<Widget> _pages = [
+    /*ProfilePage(),*/ /*SearchPage(),*/ /*AddBirdPage(),*/ /*SettingsPage()*/
+  ];
+  int _pageIndex = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: TopBar(
-          title: 'HOME',
-          appBar: AppBar(),
-          auth: widget.auth,
-          onSignOut: widget.onSignedOut,
-          userId: widget.userId,
-          onSignIn: widget.onSignedIn,
-          hasSignOut: true),
+        title: 'HOME',
+        appBar: AppBar(),
+        auth: widget.auth,
+        onSignOut: widget.onSignedOut,
+        userId: widget.userId,
+        onSignIn: widget.onSignedIn,
+        hasSignOut: true,
+        hasBack: false,
+      ),
       body: const Center(
+        // * Put your page list here
         child: Text('Home'),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add),
-            label: 'Add',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favorite',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
+      bottomNavigationBar: CurvedNavigationBar(
+        index: 0,
+        height: 50.0,
+        items: const <Widget>[
+          Icon(Icons.portrait_rounded, size: 30),
+          Icon(Icons.search, size: 30),
+          Icon(Icons.add, size: 30),
+          Icon(Icons.settings, size: 30),
         ],
+        color: Theme.of(context).bottomAppBarColor,
+        buttonBackgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Theme.of(context).canvasColor,
+        animationCurve: Curves.easeInOut,
+        animationDuration: const Duration(milliseconds: 300),
+        onTap: (index) {
+          log("Page $index");
+          setState(() {
+            _pageIndex = index;
+          });
+        },
       ),
     );
   }

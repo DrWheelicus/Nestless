@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nestless/services/authentication.dart';
 import 'package:nestless/widgets/sign_out_button.dart';
 
+// Global class for a customizable app bar
 class TopBar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
   final bool hasTitle;
@@ -39,6 +40,7 @@ class TopBar extends StatefulWidget implements PreferredSizeWidget {
   @override
   State<TopBar> createState() => _TopBarState();
 
+  // Gets the preferred size of the app bar
   @override
   Size get preferredSize => Size.fromHeight(appBar.preferredSize.height);
 }
@@ -47,27 +49,33 @@ class _TopBarState extends State<TopBar> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white.withOpacity(widget.opacity),
+      backgroundColor:
+          Theme.of(context).scaffoldBackgroundColor.withOpacity(0.4),
       elevation: 0.0,
+      // Check if the app bar has a back button
       automaticallyImplyLeading: widget.hasBack,
       iconTheme: IconThemeData(
         color: Theme.of(context).primaryColor,
       ),
+      // Check if the app bar has a title
       title: widget.hasTitle
           ? Text(
               widget.title,
               style: TextStyle(
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).textTheme.headline1!.color,
                 fontSize: 30.0,
                 fontWeight: FontWeight.normal,
                 fontFamily: 'Abraham',
               ),
             )
           : null,
+      // Check if the app bar's title is centered
       centerTitle: widget.isCenterTitle,
       actionsIconTheme: IconThemeData(
         color: Theme.of(context).primaryColor,
       ),
+      // Check if the app bar has a sign out button
+      // and populate the actions list with the given actions
       actions: widget.hasSignOut
           ? <Widget>[
                 SignOutButton(

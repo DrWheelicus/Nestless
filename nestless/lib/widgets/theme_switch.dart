@@ -23,6 +23,7 @@ class _ThemeSwitchState extends State<ThemeSwitch> {
           value: isDark,
           onChanged: (bool value) {
             setState(() {
+              // Switch the theme
               setTheme.toggleTheme();
             });
           },

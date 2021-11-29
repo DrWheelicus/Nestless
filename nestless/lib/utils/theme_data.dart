@@ -7,6 +7,7 @@ class AppThemeData with ChangeNotifier {
   static bool get isDark => _isDark;
 
   AppThemeData() {
+    // Initializing the dark mode on/off in Hive
     if (box!.containsKey('setTheme')) {
       _isDark = box!.get('setTheme');
     } else {
@@ -19,8 +20,11 @@ class AppThemeData with ChangeNotifier {
   }
 
   void toggleTheme() {
+    // Toggle the dark mode
     _isDark = !_isDark;
+    // Update the Hive
     box!.put('setTheme', _isDark);
+    // Notify the listeners
     notifyListeners();
   }
 }

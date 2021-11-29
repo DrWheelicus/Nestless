@@ -10,7 +10,9 @@ import 'package:nestless/services/authentication.dart';
 import 'package:nestless/views/home_page.dart';
 import 'package:nestless/views/login_page.dart';
 import 'package:nestless/widgets/theme_switch.dart';
+import 'package:page_transition/page_transition.dart';
 
+// Sign in state
 enum AuthStatus {
   NOT_DETERMINED,
   NOT_LOGGED_IN,
@@ -27,13 +29,17 @@ class StartPage extends StatefulWidget {
 }
 
 class _StartPageState extends State<StartPage> {
+  // Initial auth status has to be not determined
   AuthStatus _authStatus = AuthStatus.NOT_DETERMINED;
+
+  // Current user id
   // ignore: non_constant_identifier_names
   String _UID = "";
 
   @override
   void initState() {
     super.initState();
+    // Set auth status
     widget.auth.getCurrentUser().then((user) {
       setState(() {
         if (user != null) {
@@ -49,11 +55,13 @@ class _StartPageState extends State<StartPage> {
   Widget build(BuildContext context) {
     // TODO: could be an introduction screen instead of a basic scaffold
 
+    // Get the device width
     final double deviceWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
         body: SizedBox(
           width: double.infinity,
+          // TODO: this could be refactored to use a single widget
           child: Stack(
             children: [
               Positioned(
@@ -104,6 +112,7 @@ class _StartPageState extends State<StartPage> {
                   children: <Widget>[
                     FadeAnimation(
                       1.5,
+                      // Create text logo
                       AnimatedTextKit(
                         animatedTexts: [
                           ColorizeAnimatedText('Nestless',
@@ -119,6 +128,7 @@ class _StartPageState extends State<StartPage> {
                     const SizedBox(height: 16),
                     FadeAnimation(
                       1.6,
+                      // Create text description
                       Text(
                         'A lightweight bird tracking app.',
                         style: Theme.of(context).textTheme.bodyText1,
@@ -127,6 +137,7 @@ class _StartPageState extends State<StartPage> {
                     const SizedBox(height: 16),
                     FadeAnimation(
                       1.7,
+                      // Create button to start app
                       AnimatedButton(
                         width: deviceWidth * 0.7,
                         borderRadius: 20,
@@ -157,8 +168,10 @@ class _StartPageState extends State<StartPage> {
                         text: 'GET STARTED',
                         borderWidth: 1.5,
                         transitionType: TransitionType.LEFT_TOP_ROUNDER,
-                        onPress: () {
+                        onPress: () async {
+                          // Check auth status and navigate to correct page
                           switch (_authStatus) {
+                            // If not logged in, navigate to login page
                             case AuthStatus.NOT_LOGGED_IN:
                               AdvanceSnackBar(
                                       message:
@@ -167,14 +180,17 @@ class _StartPageState extends State<StartPage> {
                                       type: 'INFO',
                                       closeIconPosition: 'RIGHT',
                                       iconPosition: 'LEFT',
+                                      isIcon: true,
                                       bgColor: Theme.of(context)
                                           .buttonTheme
                                           .colorScheme!
                                           .primaryVariant)
                                   .show(context);
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => LoginPage(
+                              Navigator.push(
+                                context,
+                                PageTransition(
+                                  type: PageTransitionType.fade,
+                                  child: LoginPage(
                                     title: 'LOGIN',
                                     auth: widget.auth,
                                     onSignedIn: loginCallback,
@@ -185,10 +201,21 @@ class _StartPageState extends State<StartPage> {
                                 ),
                               );
                               break;
+                            // If logged in, navigate to home page
                             case AuthStatus.LOGGED_IN:
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => HomePage(
+                              const AdvanceSnackBar(
+                                message: 'Welcome back!',
+                                mode: 'ADVANCE',
+                                type: 'INFO',
+                                closeIconPosition: 'RIGHT',
+                                isIcon: true,
+                                iconPosition: 'LEFT',
+                              ).show(context);
+                              Navigator.push(
+                                context,
+                                PageTransition(
+                                  type: PageTransitionType.bottomToTop,
+                                  child: HomePage(
                                     auth: widget.auth,
                                     onSignedOut: logoutCallback,
                                     onSignedIn: loginCallback,
@@ -197,6 +224,7 @@ class _StartPageState extends State<StartPage> {
                                 ),
                               );
                               break;
+                            // If unknown, show error
                             case AuthStatus.NOT_DETERMINED:
                               AdvanceSnackBar(
                                       message: 'Account unretrievable!',
@@ -226,10 +254,13 @@ class _StartPageState extends State<StartPage> {
         ),
         floatingActionButton: const FadeAnimation(
           1.8,
+          // Create button to switch theme
           ThemeSwitch(),
         ));
   }
 
+  // Callback for when user logs in. Updates auth status and user ID
+  // ! Can be called from anywhere
   void loginCallback() {
     widget.auth.getCurrentUser().then((user) {
       setState(() {
@@ -241,6 +272,8 @@ class _StartPageState extends State<StartPage> {
     });
   }
 
+  // Callback for when user logs out. Updates auth status
+  // ! Can be called from anywhere
   void logoutCallback() {
     setState(() {
       _authStatus = AuthStatus.NOT_LOGGED_IN;
