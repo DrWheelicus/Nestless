@@ -13,13 +13,16 @@ class LoginPage extends StatefulWidget {
   final VoidCallback onSignedOut;
   final String userId;
 
+  final bool isLinkLogin;
+
   const LoginPage(
       {Key? key,
       required this.title,
       required this.auth,
       required this.onSignedIn,
       required this.onSignedOut,
-      required this.userId})
+      required this.userId,
+      required this.isLinkLogin})
       : super(key: key);
 
   @override
@@ -61,7 +64,9 @@ class _LoginPageState extends State<LoginPage> {
             hasBack: false,
             hasSignOut: false,
             auth: widget.auth,
-            onSignOut: widget.onSignedIn,
+            onSignOut: widget.onSignedOut,
+            onSignIn: widget.onSignedIn,
+            userId: widget.userId,
             opacity: 0.4,
           ),
           body: LoginSignupDialog(
@@ -70,6 +75,7 @@ class _LoginPageState extends State<LoginPage> {
             onSignedIn: widget.onSignedIn,
             onSignedOut: widget.onSignedOut,
             userId: widget.userId,
+            isLinkLogin: widget.isLinkLogin,
           ),
           floatingActionButton: const FadeAnimation(1.5, ThemeSwitch())),
     );

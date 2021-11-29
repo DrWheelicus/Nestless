@@ -56,6 +56,8 @@ class _SignUpPageState extends State<SignUpPage> {
           title: widget.title,
           auth: widget.auth,
           onSignOut: widget.onSignedOut,
+          onSignIn: widget.onSignedIn,
+          userId: widget.userId,
           hasThemeToggle: false,
           opacity: 0.4,
         ),
