@@ -5,6 +5,8 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:nestless/services/authentication.dart';
 import 'package:nestless/widgets/top_bar.dart';
 
+import 'package:nestless/views/search_page.dart';
+
 class HomePage extends StatefulWidget {
   final BaseAuth auth;
   final VoidCallback onSignedOut;
@@ -25,8 +27,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Widget> _pages = [
-    /*ProfilePage(),*/ /*SearchPage(),*/ /*AddBirdPage(),*/ /*SettingsPage()*/
+  /*ProfilePage(),*/ /*SearchPage(),*/ /*AddBirdPage(),*/ /*SettingsPage()*/
+  final List<Widget> _pages = [
+    const SearchPage(), const SearchPage(), const SearchPage(), const SearchPage()
   ];
   int _pageIndex = 0;
   @override
@@ -42,9 +45,8 @@ class _HomePageState extends State<HomePage> {
         hasSignOut: true,
         hasBack: false,
       ),
-      body: const Center(
-        // * Put your page list here
-        child: Text('Home'),
+      body: Center(
+        child: _pages[_pageIndex],
       ),
       bottomNavigationBar: CurvedNavigationBar(
         index: 0,
