@@ -24,20 +24,23 @@ class _SearchPageState extends State<SearchPage> {
     int birdCount = selectedBirds.length;
     if (selectedBirds.length > 20) { birdCount = 20; }
     return Column(
-      children: [
-        Form(
-          child: TextFormField(
-            decoration: const InputDecoration(
-              hintText: 'Search Bird',   
-              icon: Icon(Icons.search)
+      children: [ 
+        Container(
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+          child: Form(
+            child: TextFormField(
+              decoration: const InputDecoration(
+                hintText: 'Search Bird',   
+                icon: Icon(Icons.search)
+              ),
+              onChanged: (String? value) {
+                setState(() {
+                  _searchString = value.toString();
+                  matchBirds();
+                });
+              }
             ),
-            onChanged: (String? value) {
-              setState(() {
-                _searchString = value.toString();
-                matchBirds();
-              });
-            }
-          ),
+          )
         ),
         Flexible(
           child: GridView.builder(
@@ -48,6 +51,7 @@ class _SearchPageState extends State<SearchPage> {
             itemCount: birdCount,
             itemBuilder: (BuildContext context, int i) {
               return Container(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
                 child: GridTile(
                   child: Column(
                     children: [
