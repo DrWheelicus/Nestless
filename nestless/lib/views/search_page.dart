@@ -9,11 +9,20 @@ class SearchPage extends StatefulWidget {
 } 
 
 class _SearchPageState extends State<SearchPage> {
-  final birds = FirebaseFirestore.instance.collection('birds');
   String _searchString = '';
-  
+  List<Map<String, dynamic>> birds = [];
+  List<Map<String, dynamic>> selectedBirds = [];
+
+  @override
+  void initState() {
+    super.initState();
+    createBirdList();
+  }
+
   @override 
   Widget build(BuildContext context) {
+    int birdCount = selectedBirds.length;
+    if (selectedBirds.length > 20) { birdCount = 20; }
     return Column(
       children: [
         Form(
@@ -25,47 +34,70 @@ class _SearchPageState extends State<SearchPage> {
             onChanged: (String? value) {
               setState(() {
                 _searchString = value.toString();
+                matchBirds();
               });
             }
           ),
         ),
         Flexible(
-          child: StreamBuilder(
-            stream: getBirds(),
-            builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-              if (!snapshot.hasData) return const Text("No Data");
-              return GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2
-                ),
-                scrollDirection: Axis.vertical,
-                itemCount: snapshot.data!.docs.length,
-                itemBuilder: (BuildContext context, int i) {
-                  return Container(
-                    child: GridTile(
-                      child: Column(
-                        children: [
-                          //TODO: Get image to appear / format card
-                          Text(snapshot.data!.docs[i]['commonName']),
-                          Text(snapshot.data!.docs[i]['status']),
-                          // Image.network(snapshot.data!.docs[i]['image']),
-                        ]
-                      )
-                    )
-                  );
-                }
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2
+            ),
+            scrollDirection: Axis.vertical,
+            itemCount: birdCount,
+            itemBuilder: (BuildContext context, int i) {
+              return Container(
+                child: GridTile(
+                  child: Column(
+                    children: [
+                      Image.network(
+                        selectedBirds[i]['image'],
+                        errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                          return const Image(
+                            image: AssetImage('assets/images/bird-error.jpg')
+                          );
+                        },
+                      ),
+                      Text(
+                        selectedBirds[i]['commonName'],
+                        style: TextStyle(
+                          color: Colors.deepPurpleAccent[100],
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold
+                        ),
+                      ),
+                      Text(
+                        selectedBirds[i]['status'],
+                        style: const TextStyle(fontStyle: FontStyle.italic),
+                      ),
+                    ]
+                  )
+                )
               );
             }
-          ),
+          )
         )
       ]
     );
   }
-  //TODO: Implement partial strings
-  Stream<QuerySnapshot<Map<String, dynamic>>> getBirds() {
-    return birds
-      .where('commonName', isEqualTo: _searchString)
-      .get()
-      .asStream();
+
+  void createBirdList() async {
+    QuerySnapshot<Map<String, dynamic>> querySnap = 
+      await FirebaseFirestore.instance.collection('birds').get();
+    setState(() {
+      for (var docSnap in querySnap.docs) {
+        birds.add(docSnap.data());
+      } 
+    });
+  }
+
+  void matchBirds() {
+    selectedBirds = [];
+    for (Map<String, dynamic> bird in birds) {
+      if (bird['commonName'].contains(_searchString)) {
+        selectedBirds.add(bird);
+      }
+    }
   }
 }

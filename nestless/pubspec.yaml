@@ -101,6 +101,7 @@ flutter:
     - assets/images/day.gif
     - assets/images/night.gif
     - assets/images/night2.gif
+    - assets/images/bird-error.jpg
     - assets/animations/feather.riv
 
   # An image asset can refer to one or more resolution-specific "variants", see
