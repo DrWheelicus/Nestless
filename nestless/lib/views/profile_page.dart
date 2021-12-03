@@ -66,7 +66,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             contentPadding: EdgeInsets.all(5.0),
                             hintText: "ColiKong"
                             ),
-                          readOnly: true,
+                          // readOnly: true,
                           ),
                         ),
                       SizedBox(height: 5,),
@@ -92,18 +92,44 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(width: 10,)
                 ]
               ),
-              const SizedBox(height: 60,),
+              const SizedBox(height: 20,),
               const Text("Most Recent Sighting",
                 style: TextStyle(fontSize: 20),
               ),
               const SizedBox(height: 5,),
               Container(
+                // padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                 width: MediaQuery.of(context).size.width-25,
                 height: 150,
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.black)
                 ),
-                child: const Text("Pass"),
+                child: Row(
+                  
+                  children: [
+                    
+                    Image.network(birds[0]['image']),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          birds[0]['commonName'],
+                          style: TextStyle(
+                            color: Colors.deepPurpleAccent[100],
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                        Text(
+                          birds[0]['status'],
+                          style: const TextStyle(fontStyle: FontStyle.italic),
+                        ),
+                      ],
+                    )
+
+
+                    ]
+                ),
               ),
               const SizedBox(height: 30,),
               const Text("All Seen Birds",
@@ -112,7 +138,7 @@ class _ProfilePageState extends State<ProfilePage> {
               const SizedBox(height: 5,),
               Container(
                 width: MediaQuery.of(context).size.width-25,
-                height: 175,
+                height: MediaQuery.of(context).size.height-551,
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.black)
                 ),
