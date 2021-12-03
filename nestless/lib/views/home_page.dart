@@ -6,6 +6,7 @@ import 'package:nestless/services/authentication.dart';
 import 'package:nestless/widgets/top_bar.dart';
 
 import 'package:nestless/views/search_page.dart';
+import 'package:nestless/views/profile_page.dart';
 
 class HomePage extends StatefulWidget {
   final BaseAuth auth;
@@ -29,7 +30,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   /*ProfilePage(),*/ /*SearchPage(),*/ /*AddBirdPage(),*/ /*SettingsPage()*/
   final List<Widget> _pages = [
-    const SearchPage(), const SearchPage(), const SearchPage(), const SearchPage()
+    const ProfilePage(), const SearchPage(), const SearchPage(), const SearchPage()
   ];
   int _pageIndex = 0;
   @override

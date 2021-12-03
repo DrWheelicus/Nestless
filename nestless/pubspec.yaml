@@ -103,6 +103,7 @@ flutter:
     - assets/images/night2.gif
     - assets/images/bird-error.jpg
     - assets/animations/feather.riv
+    - assets/images/forest-background.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
