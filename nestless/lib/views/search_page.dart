@@ -10,8 +10,10 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   String _searchString = '';
-  List<Map<String, dynamic>> birds = [];
-  List<Map<String, dynamic>> selectedBirds = [];
+  String currentDropValue = '[A-Z]';
+  List<String> dropItems = ['[A-Z]', '[Z-A]', 'Rarity'];
+  List<Map<String, dynamic>> birds = [], selectedBirds = [];
+  Color? purple = Colors.deepPurpleAccent[100];
 
   @override
   void initState() {
@@ -21,26 +23,58 @@ class _SearchPageState extends State<SearchPage> {
 
   @override 
   Widget build(BuildContext context) {
+    String birdName;
     int birdCount = selectedBirds.length;
     if (selectedBirds.length > 20) { birdCount = 20; }
     return Column(
-      children: [ 
+      children: [
         Container(
           padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-          child: Form(
-            child: TextFormField(
-              decoration: const InputDecoration(
-                hintText: 'Search Bird',   
-                icon: Icon(Icons.search)
+          child: Row(
+            children: [
+              Flexible(
+                flex: 4,
+                child: Form(
+                  child: TextFormField(
+                    decoration: InputDecoration(
+                      focusColor: purple,
+                      hintText: 'Search Birds',   
+                      icon: const Icon(Icons.search)
+                    ),
+                    onChanged: (String? value) {
+                      setState(() {
+                        _searchString = value.toString();
+                        matchBirds();
+                        sortBirds();
+                      });
+                    }
+                  ),
+                )
               ),
-              onChanged: (String? value) {
-                setState(() {
-                  _searchString = value.toString();
-                  matchBirds();
-                });
-              }
-            ),
-          )
+              Flexible(
+                flex: 1,
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton(
+                    value: currentDropValue,
+                    iconEnabledColor: purple,
+                    iconDisabledColor: purple,
+                    items: dropItems.map((String items) {
+                      return DropdownMenuItem(
+                        value: items,
+                        child: Text(items),
+                      );
+                    }).toList(),
+                    onChanged: (String? newVal) {
+                      setState(() {
+                        currentDropValue = newVal.toString();
+                        sortBirds();
+                      });
+                    },
+                  )
+                )
+              )
+            ]
+          ),
         ),
         Flexible(
           child: GridView.builder(
@@ -50,13 +84,14 @@ class _SearchPageState extends State<SearchPage> {
             scrollDirection: Axis.vertical,
             itemCount: birdCount,
             itemBuilder: (BuildContext context, int i) {
+              birdName = constrainName(selectedBirds[i]['commonName']);
               return Container(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                 child: GridTile(
                   child: Column(
                     children: [
                       Image.network(
-                        selectedBirds[i]['image'],
+                        selectedBirds[i]['image'], height: 105,
                         errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
                           return const Image(
                             image: AssetImage('assets/images/bird-error.jpg')
@@ -64,11 +99,12 @@ class _SearchPageState extends State<SearchPage> {
                         },
                       ),
                       Text(
-                        selectedBirds[i]['commonName'],
+                        birdName,
                         style: TextStyle(
-                          color: Colors.deepPurpleAccent[100],
+                          color: purple,
                           fontSize: 16.0,
-                          fontWeight: FontWeight.bold
+                          fontWeight: FontWeight.bold,
+                          height: 2
                         ),
                       ),
                       Text(
@@ -99,9 +135,31 @@ class _SearchPageState extends State<SearchPage> {
   void matchBirds() {
     selectedBirds = [];
     for (Map<String, dynamic> bird in birds) {
-      if (bird['commonName'].contains(_searchString)) {
+      if (bird['commonName'].toLowerCase().contains(_searchString.toLowerCase())) {
+        if (selectedBirds.length >= 20) return;
         selectedBirds.add(bird);
       }
+    }
+  }
+
+  String constrainName(String name) {
+    if (name.length > 18) {
+      return name.substring(0,15) + '...';
+    }
+    return name;
+  }
+
+  void sortBirds() {
+    if (currentDropValue == 'Rarity') {
+      selectedBirds.sort((a,b) => a['status'].compareTo(b['status']));
+    }
+    //Sort alphabetically
+    else { 
+      selectedBirds.sort((a,b) => a['commonName'].compareTo(b['commonName']));
+    }
+    //Reverse for [Z-A] and highest rarity
+    if (currentDropValue != '[A-Z]') {
+      selectedBirds = List.from(selectedBirds.reversed);
     }
   }
 }
