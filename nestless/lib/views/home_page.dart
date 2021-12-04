@@ -31,7 +31,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   /*ProfilePage(),*/ /*SearchPage(),*/ /*AddBirdPage(),*/ /*SettingsPage()*/
   final List<Widget> _pages = [
-    const ProfilePage(), const SearchPage(), const AddBirdPage(), const SearchPage()
+    const ProfilePage(id: "colinator0@hotmail.com"), const SearchPage(), const AddBirdPage(), const SearchPage()
   ];
   int _pageIndex = 0;
   @override
