@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -14,14 +16,16 @@ abstract class BaseAuth {
   // Get the current user from the FirebaseAuth instance
   Future<User?> getCurrentUser();
 
+  Future<void> setupUser(User user);
+
   // TODO: Implement this method in the main class
   // Future<void> sendEmailVerification();
 
   // Sends sign in email
-  Future<void> sendSignInLink(String email);
+  // Future<void> sendSignInLink(String email);
 
   // Sign in with dynamic link
-  Future<User> signInWithLink(String email, String link);
+  // Future<User> signInWithLink(String email, String link);
 
   // Sign in with google
   Future<User> signInWithGoogle();
@@ -65,33 +69,49 @@ class Auth implements BaseAuth {
   }
 
   @override
+  Future<void> setupUser(User user) async {
+    String uid = await getCurrentUser().then((user) => user!.uid);
+
+    // Create a new document for the user with the uid
+    await FirebaseFirestore.instance.collection('users').doc(uid).set({
+      'uid': uid,
+      'email': user.email,
+      'displayName': user.displayName,
+      'photoUrl': user.photoURL,
+      'lastSeen': DateTime.now(),
+      'createdAt': DateTime.now(),
+      'updatedAt': DateTime.now(),
+    });
+  }
+
+  @override
   Future<void> signOut() async {
     // Sign out the user
     return _firebaseAuth.signOut();
   }
 
-  @override
-  Future<void> sendSignInLink(String email) async {
-    // Sends sign in email
-    return await _firebaseAuth.sendSignInLinkToEmail(
-        email: email,
-        actionCodeSettings: ActionCodeSettings(
-            url: 'https://nestless.page.link', // URL you want to redirect to
-            handleCodeInApp: true,
-            iOSBundleId: 'com.example.nestless', // iOS
-            androidPackageName: 'com.example.nestless', // Android
-            androidMinimumVersion: '1'));
-  }
+  // @override
+  // Future<void> sendSignInLink(String email) async {
+  //   // Sends sign in email
+  //   return await _firebaseAuth.sendSignInLinkToEmail(
+  //       email: email,
+  //       actionCodeSettings: ActionCodeSettings(
+  //           url: 'https://nestless.page.link', // URL you want to redirect to
+  //           handleCodeInApp: true,
+  //           iOSBundleId: 'com.example.nestless', // iOS
+  //           androidPackageName: 'com.example.nestless', // Android
+  //           androidMinimumVersion: '1'));
+  // }
 
-  @override
-  Future<User> signInWithLink(String email, String link) async {
-    // Sign in with dynamic link
-    UserCredential result =
-        await _firebaseAuth.signInWithEmailLink(email: email, emailLink: link);
-    User? user = result.user;
-    // Return the user
-    return user!;
-  }
+  // @override
+  // Future<User> signInWithLink(String email, String link) async {
+  //   // Sign in with dynamic link
+  //   UserCredential result =
+  //       await _firebaseAuth.signInWithEmailLink(email: email, emailLink: link);
+  //   User? user = result.user;
+  //   // Return the user
+  //   return user!;
+  // }
 
   @override
   Future<User> signInWithGoogle() async {
