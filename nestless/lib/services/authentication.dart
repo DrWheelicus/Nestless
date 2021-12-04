@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -13,6 +15,8 @@ abstract class BaseAuth {
 
   // Get the current user from the FirebaseAuth instance
   Future<User?> getCurrentUser();
+
+  Future<void> setupUser(User user);
 
   // TODO: Implement this method in the main class
   // Future<void> sendEmailVerification();
@@ -62,6 +66,22 @@ class Auth implements BaseAuth {
     // Get the current user from the FirebaseAuth instance
     User? user = _firebaseAuth.currentUser;
     return user;
+  }
+
+  @override
+  Future<void> setupUser(User user) async {
+    String uid = await getCurrentUser().then((user) => user!.uid);
+
+    // Create a new document for the user with the uid
+    await FirebaseFirestore.instance.collection('users').doc(uid).set({
+      'uid': uid,
+      'email': user.email,
+      'displayName': user.displayName,
+      'photoUrl': user.photoURL,
+      'lastSeen': DateTime.now(),
+      'createdAt': DateTime.now(),
+      'updatedAt': DateTime.now(),
+    });
   }
 
   @override
