@@ -88,30 +88,38 @@ class _SearchPageState extends State<SearchPage> {
               return Container(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                 child: GridTile(
-                  child: Column(
-                    children: [
-                      Image.network(
-                        selectedBirds[i]['image'], height: 105,
-                        errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                          return const Image(
-                            image: AssetImage('assets/images/bird-error.jpg')
-                          );
-                        },
-                      ),
-                      Text(
-                        birdName,
-                        style: TextStyle(
-                          color: purple,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
-                          height: 2
+                  child: GestureDetector(
+                    onTap: () => {
+                      //! Add map page below and uncomment block
+                      //! If bird info needed use selectedBirds[i]
+                      // Navigator.push(context, MaterialPageRoute(
+                      //   builder: (context) => PUT_PAGE_HERE))
+                    },
+                    child: Column(
+                      children: [
+                        Image.network(
+                          selectedBirds[i]['image'], height: 105,
+                          errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                            return const Image(
+                              image: AssetImage('assets/images/bird-error.jpg')
+                            );
+                          },
                         ),
-                      ),
-                      Text(
-                        selectedBirds[i]['status'],
-                        style: const TextStyle(fontStyle: FontStyle.italic),
-                      ),
-                    ]
+                        Text(
+                          birdName,
+                          style: TextStyle(
+                            color: purple,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                            height: 2
+                          ),
+                        ),
+                        Text(
+                          selectedBirds[i]['status'],
+                          style: const TextStyle(fontStyle: FontStyle.italic),
+                        ),
+                      ]
+                    )
                   )
                 )
               );
