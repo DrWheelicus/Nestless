@@ -10,12 +10,32 @@ class ProfilePage extends StatefulWidget {
   _ProfilePageState createState() => _ProfilePageState();
 } 
 
+//Profile Picture URL, List of seen birds, Username, Email, Latest Seen bird
+
 class _ProfilePageState extends State<ProfilePage> {
+  final users = FirebaseFirestore.instance.collection('users');
   List<Map<String, dynamic>> birds = [];
+  String profilePictureURL = "";
+  final profilePictureURLController = TextEditingController();
+
+  // Future<void> addUser(String url, String username, String email,  List<Map<String, dynamic>> birdsSeen,  Map<String, dynamic>  latestSeen) {
+  //   return users.add({
+  //     'url': url,
+  //     'username': username,
+  //     'email': email,
+  //     'birdsSeen': birdsSeen,
+  //     'latestSeen': latestSeen,
+  //   });
+  // }
+
+  @override
+  void initState() {
+    super.initState();
+    createBirdList();
+  }
 
   @override
   Widget build(BuildContext context) {
-    createBirdList();
     return Scaffold(
       body: 
         Container(
@@ -41,13 +61,52 @@ class _ProfilePageState extends State<ProfilePage> {
                 children:[
                   const SizedBox(width: 20,),
                   Column(
-                  children: const [CircleAvatar(
-                    backgroundImage: NetworkImage(""),//TODO apply a url for the user's profile 
-                    backgroundColor: Colors.blue,
-                    child: Icon(Icons.edit),
-                    radius: 50
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context){
+                            return AlertDialog(
+                              content: Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  Form(
+                                    child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: TextField(
+                                          controller: profilePictureURLController,
+                                          decoration: const InputDecoration(
+                                          focusedBorder: OutlineInputBorder()
+                                        ),
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        profilePictureURL = profilePictureURLController.text;
+                                      },
+                                    child: const Text("Submit"),), 
+                                    ]
+                                  )
+                                  )
+                                  ],
+
+                              )
+                            );
+                          }
+                        );
+                      },
+                      child: CircleAvatar(
+                      backgroundImage: NetworkImage(profilePictureURL),
+                      backgroundColor: Colors.blue,
+                      child: const Icon(Icons.edit),
+                      radius: 50
+                      ),
                     ),
-                    Text("Edit")
+                    const Text("Edit")
                     ]
                   ),
                   const SizedBox(width: 20,),
@@ -101,9 +160,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 // padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                 width: MediaQuery.of(context).size.width-25,
                 height: 150,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black)
-                ),
+                // decoration: BoxDecoration(
+                //   border: Border.all(color: Colors.black)
+                // ),
                 child: Row(
                   
                   children: [
@@ -139,9 +198,9 @@ class _ProfilePageState extends State<ProfilePage> {
               Container(
                 width: MediaQuery.of(context).size.width-25,
                 height: MediaQuery.of(context).size.height-551,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black)
-                ),
+                // decoration: BoxDecoration(
+                //   border: Border.all(color: Colors.black)
+                // ),
                 child: GridView.builder(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2
@@ -149,8 +208,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   scrollDirection: Axis.vertical,
                   itemCount: birds.length,
                   itemBuilder: (BuildContext context, int i) {
-                    return Container(
-                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                    return Card(
                       child: GridTile(
                         child: Column(
                           children: [
