@@ -16,7 +16,8 @@ abstract class BaseAuth {
   // Get the current user from the FirebaseAuth instance
   Future<User?> getCurrentUser();
 
-  Future<void> setupUser(User user);
+  Future<void> setupUser(User user, List<Map<String, dynamic>> birdsSeen,
+      Map<String, dynamic> latestSeen);
 
   // TODO: Implement this method in the main class
   // Future<void> sendEmailVerification();
@@ -69,7 +70,8 @@ class Auth implements BaseAuth {
   }
 
   @override
-  Future<void> setupUser(User user) async {
+  Future<void> setupUser(User user, List<Map<String, dynamic>> birdsSeen,
+      Map<String, dynamic> latestSeen) async {
     String uid = await getCurrentUser().then((user) => user!.uid);
 
     // Create a new document for the user with the uid
@@ -78,6 +80,8 @@ class Auth implements BaseAuth {
       'email': user.email,
       'displayName': user.displayName,
       'photoUrl': user.photoURL,
+      'birdsSeen': birdsSeen,
+      'latestSeen': latestSeen,
       'lastSeen': DateTime.now(),
       'createdAt': DateTime.now(),
       'updatedAt': DateTime.now(),
