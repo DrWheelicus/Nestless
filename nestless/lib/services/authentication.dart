@@ -18,10 +18,10 @@ abstract class BaseAuth {
   // Future<void> sendEmailVerification();
 
   // Sends sign in email
-  Future<void> sendSignInLink(String email);
+  // Future<void> sendSignInLink(String email);
 
   // Sign in with dynamic link
-  Future<User> signInWithLink(String email, String link);
+  // Future<User> signInWithLink(String email, String link);
 
   // Sign in with google
   Future<User> signInWithGoogle();
@@ -70,28 +70,28 @@ class Auth implements BaseAuth {
     return _firebaseAuth.signOut();
   }
 
-  @override
-  Future<void> sendSignInLink(String email) async {
-    // Sends sign in email
-    return await _firebaseAuth.sendSignInLinkToEmail(
-        email: email,
-        actionCodeSettings: ActionCodeSettings(
-            url: 'https://nestless.page.link', // URL you want to redirect to
-            handleCodeInApp: true,
-            iOSBundleId: 'com.example.nestless', // iOS
-            androidPackageName: 'com.example.nestless', // Android
-            androidMinimumVersion: '1'));
-  }
+  // @override
+  // Future<void> sendSignInLink(String email) async {
+  //   // Sends sign in email
+  //   return await _firebaseAuth.sendSignInLinkToEmail(
+  //       email: email,
+  //       actionCodeSettings: ActionCodeSettings(
+  //           url: 'https://nestless.page.link', // URL you want to redirect to
+  //           handleCodeInApp: true,
+  //           iOSBundleId: 'com.example.nestless', // iOS
+  //           androidPackageName: 'com.example.nestless', // Android
+  //           androidMinimumVersion: '1'));
+  // }
 
-  @override
-  Future<User> signInWithLink(String email, String link) async {
-    // Sign in with dynamic link
-    UserCredential result =
-        await _firebaseAuth.signInWithEmailLink(email: email, emailLink: link);
-    User? user = result.user;
-    // Return the user
-    return user!;
-  }
+  // @override
+  // Future<User> signInWithLink(String email, String link) async {
+  //   // Sign in with dynamic link
+  //   UserCredential result =
+  //       await _firebaseAuth.signInWithEmailLink(email: email, emailLink: link);
+  //   User? user = result.user;
+  //   // Return the user
+  //   return user!;
+  // }
 
   @override
   Future<User> signInWithGoogle() async {
