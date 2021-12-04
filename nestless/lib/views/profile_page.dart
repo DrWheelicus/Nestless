@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:glass_kit/glass_kit.dart';
 
 class ProfilePage extends StatefulWidget {
-  final String id;
-
-  const ProfilePage({required this.id,Key? key }) : super(key: key);
+  const ProfilePage({Key? key }) : super(key: key);
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
@@ -14,19 +12,11 @@ class ProfilePage extends StatefulWidget {
 
 //Profile Picture URL, List of seen birds, Username, Email, Latest Seen bird
 
-// ! ASSUMING I HAVE THE EMAIL 
-
-
-//Load page -> Get specific user from db -> whenever an edit is made, call a function that edits in firebase.
-
 class _ProfilePageState extends State<ProfilePage> {
-  List<Map<String, dynamic>> birds = [];
-  String? profilePictureURL;
-  final profilePictureURLController = TextEditingController();
-  final userNameController = TextEditingController();
-  String userName = "";
   final users = FirebaseFirestore.instance.collection('users');
-  
+  List<Map<String, dynamic>> birds = [];
+  String profilePictureURL = "";
+  final profilePictureURLController = TextEditingController();
 
   // Future<void> addUser(String url, String username, String email,  List<Map<String, dynamic>> birdsSeen,  Map<String, dynamic>  latestSeen) {
   //   return users.add({
@@ -39,21 +29,13 @@ class _ProfilePageState extends State<ProfilePage> {
   // }
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     createBirdList();
   }
 
-  void getUserInfo() async{
-    // String id = widget.auth.getCurrentUser().uid;
-    var userDetails = await users.doc(widget.id).get();
-    userName = userDetails['username'];
-    profilePictureURL = userDetails['url'];
-  }
-
   @override
-  Widget build(BuildContext context){
-    // getUserInfo();
+  Widget build(BuildContext context) {
     return Scaffold(
       body: 
         Container(
@@ -104,8 +86,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                     ElevatedButton(
                                       onPressed: () {
-                                        String? profilePictureURL = profilePictureURLController.text;
-                                        updateURL(profilePictureURL);
+                                        profilePictureURL = profilePictureURLController.text;
                                       },
                                     child: const Text("Submit"),), 
                                     ]
@@ -119,7 +100,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         );
                       },
                       child: CircleAvatar(
-                      backgroundImage: NetworkImage(profilePictureURL?? "https://static.wikia.nocookie.net/ricksanchez/images/3/30/Birdperson.jpg/revision/latest/top-crop/width/360/height/450?cb=20191107125636"), // ! FUCKING CHANGE THE URL BEFORE YOU SUBMIT JESUS CHRIST
+                      backgroundImage: NetworkImage(profilePictureURL),
                       backgroundColor: Colors.blue,
                       child: const Icon(Icons.edit),
                       radius: 50
@@ -130,48 +111,41 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   const SizedBox(width: 20,),
                   Column(
-                    children:[
-                      const Text("Username",
+                    children: const [
+                      Text("Username",
                         style: TextStyle(fontSize: 20),
                         ), 
-                      const SizedBox(height: 5,),
+                      SizedBox(height: 5,),
                       SizedBox(
                         height: 30,
                         width: 200,
                         child: TextField(
-                          controller: userNameController,
-                          
-                          onSubmitted: (String? value){
-                            updateUsername(value.toString());
-                            userName = userNameController.text;
-                          },
                           decoration: InputDecoration(
-                            border: const OutlineInputBorder(),
-                            contentPadding: const EdgeInsets.all(5.0),
-                            
-                            hintText: userName,
+                            border: OutlineInputBorder(),
+                            contentPadding: EdgeInsets.all(5.0),
+                            hintText: "ColiKong"
                             ),
                           // readOnly: true,
                           ),
                         ),
-                      const SizedBox(height: 5,),
-                      const Text("E-mail",
+                      SizedBox(height: 5,),
+                      Text("E-mail",
                         style: TextStyle(fontSize: 20),
                       ),
-                      const SizedBox(height: 5,),
+                      SizedBox(height: 5,),
                       SizedBox(
                         height: 30,
                         width: 200,
                         child: TextField(
                           decoration: InputDecoration(
-                            border: const OutlineInputBorder(),
-                            contentPadding: const EdgeInsets.all(5.0),
-                            hintText: widget.id
+                            border: OutlineInputBorder(),
+                            contentPadding: EdgeInsets.all(5.0),
+                            hintText: "colinator0@hotmail.com"
                             ),
                           readOnly: true,
                           ),
                         ),
-                        const SizedBox(height: 15,)
+                        SizedBox(height: 15,)
                       ]
                     ),
                   const SizedBox(width: 10,)
@@ -234,21 +208,20 @@ class _ProfilePageState extends State<ProfilePage> {
                   scrollDirection: Axis.vertical,
                   itemCount: birds.length,
                   itemBuilder: (BuildContext context, int i) {
-                    String birdName = constrainName(birds[i]['commonName']);
                     return Card(
                       child: GridTile(
                         child: Column(
                           children: [
                             Image.network(
-                              birds[i]['image'], height: 105,
+                              birds[i]['image'],
                               errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
                                 return const Image(
-                                  image: AssetImage('assets/images/bird-error.jpg',)
+                                  image: AssetImage('assets/images/bird-error.jpg')
                                 );
                               },
                             ),
                             Text(
-                              birdName,
+                              birds[i]['commonName'],
                               style: TextStyle(
                                 color: Colors.deepPurpleAccent[100],
                                 fontSize: 16.0,
@@ -270,7 +243,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
       )
-    );  
+      );  
   }
   
   void createBirdList() async {
@@ -281,21 +254,5 @@ class _ProfilePageState extends State<ProfilePage> {
         birds.add(docSnap.data());
       } 
     });
-  }
-  String constrainName(String name) {
-    if (name.length > 18) {
-      return name.substring(0,15) + '...';
-    }
-    return name;
-  }
-
-  void updateURL(String URL){
-    users.doc(widget.id).update({'URL': URL});
-    
-
-  }
-  void updateUsername(String username) async{
-    users.doc(widget.id).update({'username': username}); 
-
   }
 }
