@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nestless/services/authentication.dart';
 
+import 'package:nestless/views/bird_location_page.dart';
+
 class SearchPage extends StatefulWidget {
   final BaseAuth auth;
   final String uid;
@@ -88,11 +90,13 @@ class _SearchPageState extends State<SearchPage> {
                     child: GridTile(
                         child: GestureDetector(
                             onTap: () => {
-                                  //! Add map page below and uncomment block
-                                  //! If bird info needed use selectedBirds[i]
-                                  // Navigator.push(context, MaterialPageRoute(
-                                  //   builder: (context) => PUT_PAGE_HERE))
-                                },
+                              if (selectedBirds[i]['location'] != null){
+                                //! Add map page below and uncomment block
+                                //! If bird info needed use selectedBirds[i]
+                                Navigator.push(context, MaterialPageRoute(
+                                  builder: (context) => BirdLocationPage(selectedBirds[i])))
+                              } else {_showAlertDialog(context)}
+                            },
                             child: Column(children: [
                               Image.network(
                                 selectedBirds[i]['image'],
@@ -163,5 +167,24 @@ class _SearchPageState extends State<SearchPage> {
     if (currentDropValue != '[A-Z]') {
       selectedBirds = List.from(selectedBirds.reversed);
     }
+  }
+  _showAlertDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Location Error"),
+            content: Text("No Locations Found"),
+            actions: [
+              TextButton(
+                  onPressed: () {	
+                    return Navigator.pop(context);
+                  },
+                  child: Text("OK", style: TextStyle(fontSize: 20, color: Colors.purpleAccent))),
+            ],
+          );
+        }).then((value) {
+      setState(() {});
+    });
   }
 }
