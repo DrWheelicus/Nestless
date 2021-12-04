@@ -30,12 +30,34 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   /*ProfilePage(),*/ /*SearchPage(),*/ /*AddBirdPage(),*/ /*SettingsPage()*/
+<<<<<<< HEAD
   final List<Widget> _pages = [
     const ProfilePage(id: "colinator0@hotmail.com"), const SearchPage(), const AddBirdPage(), const SearchPage()
   ];
+=======
+
+>>>>>>> 1607fb64436499787c360a6239c2e3bf6a8ea305
   int _pageIndex = 0;
   @override
   Widget build(BuildContext context) {
+    final List<Widget> _pages = [
+      ProfilePage(
+        auth: widget.auth,
+        uid: widget.userId,
+      ),
+      SearchPage(
+        auth: widget.auth,
+        uid: widget.userId,
+      ),
+      AddBirdPage(
+        auth: widget.auth,
+        uid: widget.userId,
+      ),
+      // SettingsPage(
+      //   auth: widget.auth,
+      //   uid: widget.userId,
+      // ),
+    ];
     return Scaffold(
       appBar: TopBar(
         title: 'HOME',
