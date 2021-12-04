@@ -66,57 +66,57 @@ class _LoginSignupDialogState extends State<LoginSignupDialog>
 
   // Detect when app is in the background and open link
   // ! Not working
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) async {
-    try {
-      FirebaseDynamicLinks.instance.onLink(
-          onSuccess: (PendingDynamicLinkData? dynamicLink) async {
-        final Uri? deepLink = dynamicLink?.link;
-        if (deepLink != null) {
-          handleLink(deepLink, _emailController.text);
-          FirebaseDynamicLinks.instance.onLink(
-              onSuccess: (PendingDynamicLinkData? dynamicLink) async {
-            final Uri? deepLink = dynamicLink!.link;
-            handleLink(deepLink!, _emailController.text);
-          }, onError: (OnLinkErrorException e) async {
-            log(e.message.toString());
-          });
-          // Navigator.pushNamed(context, deepLink.path);
-        }
-      }, onError: (OnLinkErrorException e) async {
-        log(e.message.toString());
-      });
+  // @override
+  // void didChangeAppLifecycleState(AppLifecycleState state) async {
+  //   try {
+  //     FirebaseDynamicLinks.instance.onLink(
+  //         onSuccess: (PendingDynamicLinkData? dynamicLink) async {
+  //       final Uri? deepLink = dynamicLink?.link;
+  //       if (deepLink != null) {
+  //         handleLink(deepLink, _emailController.text);
+  //         FirebaseDynamicLinks.instance.onLink(
+  //             onSuccess: (PendingDynamicLinkData? dynamicLink) async {
+  //           final Uri? deepLink = dynamicLink!.link;
+  //           handleLink(deepLink!, _emailController.text);
+  //         }, onError: (OnLinkErrorException e) async {
+  //           log(e.message.toString());
+  //         });
+  //         // Navigator.pushNamed(context, deepLink.path);
+  //       }
+  //     }, onError: (OnLinkErrorException e) async {
+  //       log(e.message.toString());
+  //     });
 
-      final PendingDynamicLinkData? data =
-          await FirebaseDynamicLinks.instance.getInitialLink();
-      final Uri? deepLink = data?.link;
+  //     final PendingDynamicLinkData? data =
+  //         await FirebaseDynamicLinks.instance.getInitialLink();
+  //     final Uri? deepLink = data?.link;
 
-      if (deepLink != null) {
-        log(deepLink.userInfo);
-      }
-    } catch (e) {
-      log(e.toString());
-    }
-  }
+  //     if (deepLink != null) {
+  //       log(deepLink.userInfo);
+  //     }
+  //   } catch (e) {
+  //     log(e.toString());
+  //   }
+  // }
 
-  // Handle dynamic link
-  void handleLink(Uri link, userEmail) async {
-    // ignore: unnecessary_null_comparison
-    if (link != null) {
-      log(userEmail);
-      final UserCredential user =
-          await FirebaseAuth.instance.signInWithEmailLink(
-        email: userEmail,
-        emailLink: link.toString(),
-      );
-      // ignore: unnecessary_null_comparison
-      if (user != null) {
-        log(user.credential.toString());
-      }
-    } else {
-      log("link is null");
-    }
-  }
+  // // Handle dynamic link
+  // void handleLink(Uri link, userEmail) async {
+  //   // ignore: unnecessary_null_comparison
+  //   if (link != null) {
+  //     log(userEmail);
+  //     final UserCredential user =
+  //         await FirebaseAuth.instance.signInWithEmailLink(
+  //       email: userEmail,
+  //       emailLink: link.toString(),
+  //     );
+  //     // ignore: unnecessary_null_comparison
+  //     if (user != null) {
+  //       log(user.credential.toString());
+  //     }
+  //   } else {
+  //     log("link is null");
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -159,7 +159,7 @@ class _LoginSignupDialogState extends State<LoginSignupDialog>
                       // * is added to
                       ? MediaQuery.of(context).size.height * 0.4
                       : MediaQuery.of(context).size.height *
-                          0.55 // ! DO NOT CHANGE
+                          0.48 // ! DO NOT CHANGE
                   : MediaQuery.of(context).size.height * 0.5,
               width: MediaQuery.of(context).size.width,
               elevation: 10,
@@ -251,124 +251,126 @@ class _LoginSignupDialogState extends State<LoginSignupDialog>
                   FadeAnimation(
                       1.5,
                       AnimatedButton(
-                        // Set the button text based on whether the user is
-                        // logging in or signing up
-                        text: widget.isLogin ? "LOGIN" : "SIGN UP",
-                        textStyle: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 30,
-                          fontFamily: 'Abraham',
-                        ),
-                        backgroundColor: Theme.of(context).primaryColor,
-                        selectedBackgroundColor:
-                            Theme.of(context).colorScheme.secondary,
-                        selectedTextColor:
-                            Theme.of(context).colorScheme.onSecondary,
-                        width: MediaQuery.of(context).size.width * 0.4,
-                        borderRadius: 20,
-                        borderColor: Theme.of(context).colorScheme.secondary,
-                        borderWidth: 1.5,
-                        onPress: () {
-                          String userId = "";
+                          // Set the button text based on whether the user is
+                          // logging in or signing up
+                          text: widget.isLogin ? "LOGIN" : "SIGN UP",
+                          textStyle: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 30,
+                            fontFamily: 'Abraham',
+                          ),
+                          backgroundColor: Theme.of(context).primaryColor,
+                          selectedBackgroundColor:
+                              Theme.of(context).colorScheme.secondary,
+                          selectedTextColor:
+                              Theme.of(context).colorScheme.onSecondary,
+                          width: MediaQuery.of(context).size.width * 0.4,
+                          borderRadius: 20,
+                          borderColor: Theme.of(context).colorScheme.secondary,
+                          borderWidth: 1.5,
+                          onPress: () {
+                            String userId = "";
 
-                          // Check if the form is valid
-                          if (_formKey.currentState!.validate() &&
-                              !widget.isLinkLogin) {
-                            // Check if the user is logging in or signing up
-                            widget.isLogin
-                                // If the user is logging in, log them in (obviously)
-                                ? widget.auth
-                                    .signIn(_emailController.text,
-                                        _passwordController.text)
-                                    .then((user) {
-                                    userId = user.uid;
-                                    if (userId.isNotEmpty) {
-                                      widget.onSignedIn();
-                                      _success = true;
-                                      _userEmail = user.email;
-                                      widget.userId = user.uid;
-                                      // Navigate to the home page
-                                      Navigator.push(
-                                          context,
-                                          PageTransition(
-                                              child: HomePage(
-                                                userId: userId,
-                                                auth: widget.auth,
-                                                onSignedOut: widget.onSignedOut,
-                                                onSignedIn: widget.onSignedIn,
-                                              ),
-                                              type: PageTransitionType.fade));
-                                    } else {
-                                      _success = false;
-                                      // TODO: Change this to a personalized snackbar
-                                      // * Should be a more user friendly error message
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            "Login failed",
-                                            style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onError,
-                                            ),
-                                          ),
-                                          backgroundColor:
-                                              Theme.of(context).errorColor,
-                                        ),
-                                      );
-                                    }
-                                  })
-                                // If the user is signing up, sign them up (obviously)
-                                : widget.auth
-                                    .signUp(_emailController.text,
-                                        _passwordController.text)
-                                    .then(
-                                    (user) {
+                            // Check if the form is valid
+                            if (_formKey.currentState!.validate() &&
+                                !widget.isLinkLogin) {
+                              // Check if the user is logging in or signing up
+                              widget.isLogin
+                                  // If the user is logging in, log them in (obviously)
+                                  ? widget.auth
+                                      .signIn(_emailController.text,
+                                          _passwordController.text)
+                                      .then((user) {
                                       userId = user.uid;
                                       if (userId.isNotEmpty) {
                                         widget.onSignedIn();
                                         _success = true;
                                         _userEmail = user.email;
+                                        widget.userId = user.uid;
                                         // Navigate to the home page
                                         Navigator.push(
                                             context,
                                             PageTransition(
-                                                type: PageTransitionType
-                                                    .bottomToTop,
                                                 child: HomePage(
+                                                  userId: userId,
                                                   auth: widget.auth,
                                                   onSignedOut:
                                                       widget.onSignedOut,
                                                   onSignedIn: widget.onSignedIn,
-                                                  userId: userId,
-                                                )));
+                                                ),
+                                                type: PageTransitionType.fade));
                                       } else {
                                         _success = false;
+                                        // TODO: Change this to a personalized snackbar
+                                        // * Should be a more user friendly error message
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              "Login failed",
+                                              style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onError,
+                                              ),
+                                            ),
+                                            backgroundColor:
+                                                Theme.of(context).errorColor,
+                                          ),
+                                        );
                                       }
-                                    },
-                                  );
-                          } else if (_formKey.currentState!.validate() &&
-                              widget.isLinkLogin) {
-                            // Email link login
-                            widget.auth.sendSignInLink(_emailController.text);
-                            widget.onSignedIn();
-                            _success = true;
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  "Email sent",
-                                  style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.onError,
-                                  ),
-                                ),
-                                backgroundColor: Theme.of(context).primaryColor,
-                              ),
-                            );
-                          }
-                        },
-                      )),
+                                    })
+                                  // If the user is signing up, sign them up (obviously)
+                                  : widget.auth
+                                      .signUp(_emailController.text,
+                                          _passwordController.text)
+                                      .then(
+                                      (user) {
+                                        userId = user.uid;
+                                        if (userId.isNotEmpty) {
+                                          widget.onSignedIn();
+                                          _success = true;
+                                          _userEmail = user.email;
+                                          // Navigate to the home page
+                                          Navigator.push(
+                                              context,
+                                              PageTransition(
+                                                  type: PageTransitionType
+                                                      .bottomToTop,
+                                                  child: HomePage(
+                                                    auth: widget.auth,
+                                                    onSignedOut:
+                                                        widget.onSignedOut,
+                                                    onSignedIn:
+                                                        widget.onSignedIn,
+                                                    userId: userId,
+                                                  )));
+                                        } else {
+                                          _success = false;
+                                        }
+                                      },
+                                    );
+                              // } else if (_formKey.currentState!.validate() &&
+                              //     widget.isLinkLogin) {
+                              //   // Email link login
+                              //   widget.auth.sendSignInLink(_emailController.text);
+                              //   widget.onSignedIn();
+                              //   _success = true;
+                              //   ScaffoldMessenger.of(context).showSnackBar(
+                              //     SnackBar(
+                              //       content: Text(
+                              //         "Email sent",
+                              //         style: TextStyle(
+                              //           color:
+                              //               Theme.of(context).colorScheme.onError,
+                              //         ),
+                              //       ),
+                              //       backgroundColor: Theme.of(context).primaryColor,
+                              //     ),
+                              //   );
+                              // }
+                            }
+                          })),
                   const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -448,49 +450,49 @@ class _LoginSignupDialogState extends State<LoginSignupDialog>
                           widget.isLinkLogin
                               ? Container()
                               : Column(
-                                  children: [
-                                    const SizedBox(height: 2),
-                                    ElevatedButton.icon(
-                                      onPressed: () {
-                                        Navigator.push(
-                                            context,
-                                            PageTransition(
-                                                type: PageTransitionType.fade,
-                                                child: LoginPage(
-                                                  auth: widget.auth,
-                                                  onSignedOut:
-                                                      widget.onSignedOut,
-                                                  isLinkLogin: true,
-                                                  onSignedIn: widget.onSignedIn,
-                                                  userId: widget.userId,
-                                                  title: 'LOGIN',
-                                                )));
-                                      },
-                                      icon: const Icon(
-                                        Icons.link,
-                                      ),
-                                      label: const Text("Passwordless Sign In"),
-                                      style: ButtonStyle(
-                                        backgroundColor:
-                                            MaterialStateProperty.all(
-                                          Theme.of(context)
-                                              .colorScheme
-                                              .secondary,
-                                        ),
-                                        foregroundColor:
-                                            MaterialStateProperty.all(
-                                          Theme.of(context)
-                                              .colorScheme
-                                              .onSecondary,
-                                        ),
-                                        shape: MaterialStateProperty.all(
-                                          RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
+                                  children: const [
+                                    SizedBox(height: 2),
+                                    // ElevatedButton.icon(
+                                    //   onPressed: () {
+                                    //     Navigator.push(
+                                    //         context,
+                                    //         PageTransition(
+                                    //             type: PageTransitionType.fade,
+                                    //             child: LoginPage(
+                                    //               auth: widget.auth,
+                                    //               onSignedOut:
+                                    //                   widget.onSignedOut,
+                                    //               isLinkLogin: true,
+                                    //               onSignedIn: widget.onSignedIn,
+                                    //               userId: widget.userId,
+                                    //               title: 'LOGIN',
+                                    //             )));
+                                    //   },
+                                    //   icon: const Icon(
+                                    //     Icons.link,
+                                    //   ),
+                                    //   label: const Text("Passwordless Sign In"),
+                                    //   style: ButtonStyle(
+                                    //     backgroundColor:
+                                    //         MaterialStateProperty.all(
+                                    //       Theme.of(context)
+                                    //           .colorScheme
+                                    //           .secondary,
+                                    //     ),
+                                    //     foregroundColor:
+                                    //         MaterialStateProperty.all(
+                                    //       Theme.of(context)
+                                    //           .colorScheme
+                                    //           .onSecondary,
+                                    //     ),
+                                    //     shape: MaterialStateProperty.all(
+                                    //       RoundedRectangleBorder(
+                                    //         borderRadius:
+                                    //             BorderRadius.circular(10),
+                                    //       ),
+                                    //     ),
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
                           const SizedBox(height: 20),
