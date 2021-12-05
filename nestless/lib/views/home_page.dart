@@ -8,6 +8,7 @@ import 'package:nestless/widgets/top_bar.dart';
 import 'package:nestless/views/search_page.dart';
 import 'package:nestless/views/profile_page.dart';
 import 'package:nestless/views/add_bird_page.dart';
+import 'package:nestless/views/settings_page.dart';
 
 class HomePage extends StatefulWidget {
   final BaseAuth auth;
@@ -47,9 +48,12 @@ class _HomePageState extends State<HomePage> {
         auth: widget.auth,
         uid: widget.userId,
       ),
-      SearchPage(
+      SettingsPage(
         auth: widget.auth,
-        uid: widget.userId,
+        userId: widget.userId,
+        onSignedOut: widget.onSignedOut,
+        onSignedIn: widget.onSignedIn,
+
       ),
     ];
     return Scaffold(
