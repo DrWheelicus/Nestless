@@ -168,6 +168,7 @@ class _SearchPageState extends State<SearchPage> {
       selectedBirds = List.from(selectedBirds.reversed);
     }
   }
+  
   _showAlertDialog(BuildContext context) {
     return showDialog(
         context: context,
