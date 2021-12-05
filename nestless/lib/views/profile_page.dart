@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:glass_kit/glass_kit.dart';
 import 'package:nestless/services/authentication.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ProfilePage extends StatefulWidget {
   final BaseAuth auth;
@@ -22,12 +23,7 @@ class ProfilePage extends StatefulWidget {
 //Load page -> Get specific user from db -> whenever an edit is made, call a function that edits in firebase.
 
 class _ProfilePageState extends State<ProfilePage> {
-  List<Map<String, dynamic>> birds = [];
-  String? profilePictureURL;
-  final profilePictureURLController = TextEditingController();
-  final userNameController = TextEditingController();
-  String userName = "";
-  final users = FirebaseFirestore.instance.collection('users');
+  // String email = "";
 
   // Future<void> addUser(String url, String username, String email,  List<Map<String, dynamic>> birdsSeen,  Map<String, dynamic>  latestSeen) {
   //   return users.add({
@@ -38,23 +34,30 @@ class _ProfilePageState extends State<ProfilePage> {
   //     'latestSeen': latestSeen,
   //   });
   // }
-
+  String? username;  
+  String? email;
+  String? photoURL;
+  String? uid;
+  List<Map<String, dynamic>> birds = [];
+  String? profilePictureURL;
+  final profilePictureURLController = TextEditingController();
+  final userNameController = TextEditingController();
+  final users = FirebaseFirestore.instance.collection('users');
+  
+  
   @override
   void initState() {
     super.initState();
     createBirdList();
   }
 
-  void getUserInfo() async {
-    // String id = widget.auth.getCurrentUser().uid;
-    var userDetails = await users.doc(widget.uid).get();
-    userName = userDetails['username'];
-    profilePictureURL = userDetails['url'];
-  }
+  // Future<String> getEmail() async{
+  //   // return await widget.auth.getCurrentUser().then((user) => user!.email);
+  // }
 
   @override
   Widget build(BuildContext context) {
-    // getUserInfo();
+    getUserInfo();
     return Scaffold(
         body: Container(
       height: MediaQuery.of(context).size.height,
@@ -101,9 +104,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                   ),
                                   ElevatedButton(
                                     onPressed: () {
-                                      String? profilePictureURL =
+                                      String? photoURL =
                                           profilePictureURLController.text;
-                                      updateURL(profilePictureURL);
+                                      updateURL(photoURL);
                                     },
                                     child: const Text("Submit"),
                                   ),
@@ -113,8 +116,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       });
                 },
                 child: CircleAvatar(
-                    backgroundImage: NetworkImage(profilePictureURL ??
-                        "https://static.wikia.nocookie.net/ricksanchez/images/3/30/Birdperson.jpg/revision/latest/top-crop/width/360/height/450?cb=20191107125636"), // ! FUCKING CHANGE THE URL BEFORE YOU SUBMIT JESUS CHRIST
+                    backgroundImage: NetworkImage(photoURL ??
+                        "https://avatarfiles.alphacoders.com/976/thumb-1920-97632.jpg"), // ! FUCKING CHANGE THE URL BEFORE YOU SUBMIT JESUS CHRIST
                     backgroundColor: Colors.blue,
                     child: const Icon(Icons.edit),
                     radius: 50),
@@ -139,13 +142,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   controller: userNameController,
 
                   onSubmitted: (String? value) {
+                    print(value);
                     updateUsername(value.toString());
-                    userName = userNameController.text;
+                    // username = userNameController.text;
                   },
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),
                     contentPadding: const EdgeInsets.all(5.0),
-                    hintText: userName,
+                    hintText: username,
                   ),
                   // readOnly: true,
                 ),
@@ -167,7 +171,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   decoration: InputDecoration(
                       border: const OutlineInputBorder(),
                       contentPadding: const EdgeInsets.all(5.0),
-                      hintText: widget.uid),
+                      hintText: email),
                   readOnly: true,
                 ),
               ),
@@ -288,21 +292,55 @@ class _ProfilePageState extends State<ProfilePage> {
     return name;
   }
 
-  void updateURL(String URL) {
-    widget.auth.getCurrentUser().then((user) {
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(user!.uid)
-          .update({'photoUrl': URL});
-    });
+  void getUserInfo() async {
+    // QuerySnapshot<Map<String, dynamic>> querySnap =
+    //     await FirebaseFirestore.instance.collection('users').get();
+    // String id = widget.auth.getCurrentUser().uid;
+    
+    print("Pass");
+    // print(querySnap.docs);
+    var userDetails = await users.doc(widget.uid).get();
+    User? user = await widget.auth.getCurrentUser();
+    email = user!.email;
+    uid = user.uid;
+    // user.updateDisplayName("Pass");
+    username = user.displayName;
+    photoURL = user.photoURL;
+    // updateUsername("ColiKong");
+    // String? 
+    // print(email);
+    print("UID below");
+    print(uid);
+    print("Username below");
+    print(username);
+    username = userDetails['username'];
+    profilePictureURL = userDetails['url'];
   }
 
-  void updateUsername(String username) async {
-    widget.auth.getCurrentUser().then((user) {
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(user!.uid)
-          .update({'username': username});
+  void updateURL(String URL) async{
+    User? user = await widget.auth.getCurrentUser();
+    setState(() {
+    user!.updatePhotoURL(URL);
+      
     });
+
+    }
+    // widget.auth.getCurrentUser().then((user) {
+    //   FirebaseFirestore.instance
+    //       .collection('users')
+    //       .doc(user!.uid)
+    //       .update({'photoUrl': URL});
+    // });
+
+  void updateUsername(String username) async {
+    User? user = await widget.auth.getCurrentUser();
+    user!.updateDisplayName(username);
+  //   widget.auth.getCurrentUser().then((user) {
+  //     FirebaseFirestore.instance
+  //         .collection('users')
+  //         .doc(user!.uid)
+  //         .update({'displayName': username});
+  //   });
+  // }
   }
 }
