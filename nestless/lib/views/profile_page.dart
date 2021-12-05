@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:glass_kit/glass_kit.dart';
 import 'package:nestless/services/authentication.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:nestless/views/bird_location_page.dart';
 
 class ProfilePage extends StatefulWidget {
   final BaseAuth auth;
@@ -17,9 +18,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 //Profile Picture URL, List of seen birds, Username, Email, Latest Seen bird
-
-// ! ASSUMING I HAVE THE EMAIL
-
 //Load page -> Get specific user from db -> whenever an edit is made, call a function that edits in firebase.
 
 class _ProfilePageState extends State<ProfilePage> {
@@ -38,7 +36,9 @@ class _ProfilePageState extends State<ProfilePage> {
   String? email;
   String? photoURL;
   String? uid;
+  int points = 0;
   List<Map<String, dynamic>> birds = [];
+  Map<String, dynamic> latestSeen = {};
   String? profilePictureURL;
   final profilePictureURLController = TextEditingController();
   final userNameController = TextEditingController();
@@ -49,6 +49,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     createBirdList();
+      
   }
 
   // Future<String> getEmail() async{
@@ -58,6 +59,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     getUserInfo();
+    pointCalc();
     return Scaffold(
         body: Container(
       height: MediaQuery.of(context).size.height,
@@ -107,6 +109,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       String? photoURL =
                                           profilePictureURLController.text;
                                       updateURL(photoURL);
+                                      return Navigator.pop(context);
                                     },
                                     child: const Text("Submit"),
                                   ),
@@ -117,7 +120,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 },
                 child: CircleAvatar(
                     backgroundImage: NetworkImage(photoURL ??
-                        "https://avatarfiles.alphacoders.com/976/thumb-1920-97632.jpg"), // ! FUCKING CHANGE THE URL BEFORE YOU SUBMIT JESUS CHRIST
+                        "https://avatarfiles.alphacoders.com/976/thumb-1920-97632.jpg"),
                     backgroundColor: Colors.blue,
                     child: const Icon(Icons.edit),
                     radius: 50),
@@ -201,19 +204,19 @@ class _ProfilePageState extends State<ProfilePage> {
             //   border: Border.all(color: Colors.black)
             // ),
             child: Row(children: [
-              Image.network(birds[0]['image']),
+              Image.network(latestSeen['image']?? "https://avatarfiles.alphacoders.com/976/thumb-1920-97632.jpg"),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    birds[0]['commonName'],
+                    latestSeen['commonName'],
                     style: TextStyle(
                         color: Colors.deepPurpleAccent[100],
                         fontSize: 16.0,
                         fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    birds[0]['status'],
+                    latestSeen['status'],
                     style: const TextStyle(fontStyle: FontStyle.italic),
                   ),
                 ],
@@ -221,12 +224,24 @@ class _ProfilePageState extends State<ProfilePage> {
             ]),
           ),
           const SizedBox(
-            height: 30,
+            height: 7,
           ),
           const Text(
             "All Seen Birds",
             style: TextStyle(fontSize: 20),
           ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                "Points: ",
+                style: TextStyle(fontSize: 15),
+              ),
+              Text(
+                pointCalc(),
+                style: const TextStyle(fontSize: 15),
+              )
+            ],),
           const SizedBox(
             height: 5,
           ),
@@ -245,30 +260,37 @@ class _ProfilePageState extends State<ProfilePage> {
                     String birdName = constrainName(birds[i]['commonName']);
                     return Card(
                         child: GridTile(
-                            child: Column(children: [
-                      Image.network(
-                        birds[i]['image'],
-                        height: 105,
-                        errorBuilder: (BuildContext context, Object exception,
-                            StackTrace? stackTrace) {
-                          return const Image(
-                              image: AssetImage(
-                            'assets/images/bird-error.jpg',
-                          ));
-                        },
-                      ),
-                      Text(
-                        birdName,
-                        style: TextStyle(
-                            color: Colors.deepPurpleAccent[100],
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        birds[i]['status'],
-                        style: const TextStyle(fontStyle: FontStyle.italic),
-                      ),
-                    ])));
+                            child: GestureDetector(
+                            onTap: () => {
+                              if (birds[i]['location'] != null){
+                                Navigator.push(context, MaterialPageRoute(
+                                  builder: (context) => BirdLocationPage(birds[i])))
+                              } else {_showAlertDialog(context)}
+                            },
+                          child: Column(children: [
+                            Image.network(
+                              birds[i]['image'],
+                              height: 105,
+                              errorBuilder: (BuildContext context, Object exception,
+                                  StackTrace? stackTrace) {
+                                return const Image(
+                                    image: AssetImage(
+                                  'assets/images/bird-error.jpg',
+                                ));
+                              },
+                            ),
+                            Text(
+                              birdName,
+                              style: TextStyle(
+                                  color: Colors.deepPurpleAccent[100],
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              birds[i]['status'],
+                              style: const TextStyle(fontStyle: FontStyle.italic),
+                            ),
+                          ]))));
                   }))
         ]),
       ),
@@ -276,13 +298,37 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void createBirdList() async {
+    // User? user = await widget.auth.getCurrentUser();
     QuerySnapshot<Map<String, dynamic>> querySnap =
         await FirebaseFirestore.instance.collection('birds').get();
+    
+
     setState(() {
       for (var docSnap in querySnap.docs) {
         birds.add(docSnap.data());
       }
+
     });
+  }
+
+  String pointCalc(){
+    points = 0;
+
+    for(int i = 0; i < birds.length; i++){
+      String rarityString = birds[i]['status'].split(" ")[0];
+      if(rarityString == 'common'){
+        points += 30;
+      }
+      else if(rarityString == 'uncommon'){
+        points += 75;
+      }
+      else if(rarityString == 'irregular'){
+        points += 150;
+      }
+
+    }
+
+    return points.toString();
   }
 
   String constrainName(String name) {
@@ -303,12 +349,15 @@ class _ProfilePageState extends State<ProfilePage> {
     User? user = await widget.auth.getCurrentUser();
     email = user!.email;
     uid = user.uid;
+    
     // user.updateDisplayName("Pass");
     username = user.displayName;
     photoURL = user.photoURL;
     // updateUsername("ColiKong");
     // String? 
     // print(email);
+    latestSeen = birds[0];
+    print(latestSeen['commonName']);
     print("UID below");
     print(uid);
     print("Username below");
@@ -321,7 +370,7 @@ class _ProfilePageState extends State<ProfilePage> {
     User? user = await widget.auth.getCurrentUser();
     setState(() {
     user!.updatePhotoURL(URL);
-      
+    
     });
 
     }
@@ -342,5 +391,31 @@ class _ProfilePageState extends State<ProfilePage> {
   //         .update({'displayName': username});
   //   });
   // }
+  }
+  _showAlertDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Location Error"),
+            content: Text("No Locations Found"),
+            actions: [
+              TextButton(
+                  onPressed: () {	
+                    return Navigator.pop(context);
+                  },
+                  child: Text("OK", style: TextStyle(fontSize: 20, color: Colors.purpleAccent))),
+            ],
+          );
+        }).then((value) {
+      setState(() {});
+    });
+  }
+
+  @override
+  // ignore: must_call_super
+  void dispose(){
+    userNameController.dispose();
+    profilePictureURLController.dispose();
   }
 }
