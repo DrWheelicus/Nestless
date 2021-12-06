@@ -1,4 +1,5 @@
-import 'dart:developer';
+// import 'dart:developer';
+// import 'dart:html';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:glass_kit/glass_kit.dart';
@@ -21,21 +22,13 @@ class ProfilePage extends StatefulWidget {
 //Load page -> Get specific user from db -> whenever an edit is made, call a function that edits in firebase.
 
 class _ProfilePageState extends State<ProfilePage> {
-  // String email = "";
-
-  // Future<void> addUser(String url, String username, String email,  List<Map<String, dynamic>> birdsSeen,  Map<String, dynamic>  latestSeen) {
-  //   return users.add({
-  //     'url': url,
-  //     'username': username,
-  //     'email': email,
-  //     'birdsSeen': birdsSeen,
-  //     'latestSeen': latestSeen,
-  //   });
-  // }
   String? username;  
+  // var querySnap;
   String? email;
   String? photoURL;
   String? uid;
+  String? latestCommon;
+  String? image;
   int points = 0;
   List<Map<String, dynamic>> birds = [];
   Map<String, dynamic> latestSeen = {};
@@ -52,14 +45,12 @@ class _ProfilePageState extends State<ProfilePage> {
       
   }
 
-  // Future<String> getEmail() async{
-  //   // return await widget.auth.getCurrentUser().then((user) => user!.email);
-  // }
-
   @override
   Widget build(BuildContext context) {
     getUserInfo();
     pointCalc();
+    // image = checkImage(latestSeen['image']); 
+
     return Scaffold(
         body: Container(
       height: MediaQuery.of(context).size.height,
@@ -145,7 +136,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   controller: userNameController,
 
                   onSubmitted: (String? value) {
-                    print(value);
                     updateUsername(value.toString());
                     // username = userNameController.text;
                   },
@@ -204,7 +194,19 @@ class _ProfilePageState extends State<ProfilePage> {
             //   border: Border.all(color: Colors.black)
             // ),
             child: Row(children: [
-              Image.network(latestSeen['image']?? "https://avatarfiles.alphacoders.com/976/thumb-1920-97632.jpg"),
+              Image.network(
+                latestSeen['image'],
+                height: 105,
+                errorBuilder: (BuildContext context, Object exception,
+                    StackTrace? stackTrace) {
+                  return const Image(
+                      width: 200,
+                      image: AssetImage(
+                    'assets/images/bird-error.jpg',
+                  ));
+                },
+              ),
+              // Image.network(latestSeen['image'].toString() ?? 'assets/images/bird-error.jpg'),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -248,9 +250,6 @@ class _ProfilePageState extends State<ProfilePage> {
           Container(
               width: MediaQuery.of(context).size.width - 25,
               height: MediaQuery.of(context).size.height - 551,
-              // decoration: BoxDecoration(
-              //   border: Border.all(color: Colors.black)
-              // ),
               child: GridView.builder(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2),
@@ -338,59 +337,76 @@ class _ProfilePageState extends State<ProfilePage> {
     return name;
   }
 
+  // String checkImage(latestSeen){
+  //   if(latestSeen != null) {
+  //     return latestSeen['image'];
+  //   }
+  //   else{
+  //     return 'assets/images/bird-error.jpg';
+  //   }
+  // }
+
   void getUserInfo() async {
-    // QuerySnapshot<Map<String, dynamic>> querySnap =
-    //     await FirebaseFirestore.instance.collection('users').get();
-    // String id = widget.auth.getCurrentUser().uid;
+    var querySnap = await FirebaseFirestore.instance
+        .collection('user')
+        .doc(widget.uid)
+        .get();
+    print(querySnap['latestSeen']);
+    print(widget.uid);
+    //for (var docSnap in querySnap.docs) {
+    print(querySnap['email']);
     
-    print("Pass");
-    // print(querySnap.docs);
-    var userDetails = await users.doc(widget.uid).get();
-    User? user = await widget.auth.getCurrentUser();
-    email = user!.email;
-    uid = user.uid;
+    username = querySnap['username'];
+    email = querySnap['email'];
+    photoURL = querySnap['photoURL'];
+    latestSeen = querySnap['latestSeen'];
+    latestCommon = querySnap['latestSeen']['commonName'];
+    // print(latestCommon['commonName']);
+    print(latestCommon);
+
     
-    // user.updateDisplayName("Pass");
-    username = user.displayName;
-    photoURL = user.photoURL;
-    // updateUsername("ColiKong");
-    // String? 
-    // print(email);
-    latestSeen = birds[0];
-    print(latestSeen['commonName']);
-    print("UID below");
-    print(uid);
-    print("Username below");
-    print(username);
-    username = userDetails['username'];
-    profilePictureURL = userDetails['url'];
+    print("Pass1");
+    // var userDetails = await users.doc(widget.uid).get();
+    // User? user = await widget.auth.getCurrentUser();
+    // // email = user!.email;
+    // uid = user!.uid;
+
+    // username = user.displayName;
+    // photoURL = user.photoURL;
+    // latestSeen = birds[0];
+    // user.
+    // print(latestSeen['commonName']);
+    // username = userDetails['username'];
+    // profilePictureURL = userDetails['url'];
   }
 
   void updateURL(String URL) async{
-    User? user = await widget.auth.getCurrentUser();
-    setState(() {
-    user!.updatePhotoURL(URL);
-    
-    });
-
+      await FirebaseFirestore.instance
+        .collection('user')
+        .doc(widget.uid)
+        .update({'photoURL': URL});
+      setState(() {
+        
+      });
     }
-    // widget.auth.getCurrentUser().then((user) {
-    //   FirebaseFirestore.instance
-    //       .collection('users')
-    //       .doc(user!.uid)
-    //       .update({'photoUrl': URL});
-    // });
-
   void updateUsername(String username) async {
-    User? user = await widget.auth.getCurrentUser();
-    user!.updateDisplayName(username);
-  //   widget.auth.getCurrentUser().then((user) {
-  //     FirebaseFirestore.instance
-  //         .collection('users')
-  //         .doc(user!.uid)
-  //         .update({'displayName': username});
-  //   });
-  // }
+      await FirebaseFirestore.instance
+        .collection('user')
+        .doc(widget.uid)
+        .update({'username': username});
+    
+    setState((){
+    });
+    
+    // querySnap.data().update(widget.uid, (value) => username, update);
+    //for (var docSnap in querySnap.docs) {
+    // username = querySnap['username'];
+      print("Test");
+
+
+
+    // User? user = await widget.auth.getCurrentUser();
+    // user!.updateDisplayName(username);
   }
   _showAlertDialog(BuildContext context) {
     return showDialog(
@@ -412,10 +428,10 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
-  @override
-  // ignore: must_call_super
-  void dispose(){
-    userNameController.dispose();
-    profilePictureURLController.dispose();
-  }
+  // @override
+  // // ignore: must_call_super
+  // void dispose(){
+  //   userNameController.dispose();
+  //   profilePictureURLController.dispose();
+  // }
 }
