@@ -19,7 +19,6 @@ abstract class BaseAuth {
   Future<void> setupUser(User user, List<Map<String, dynamic>> birdsSeen,
       Map<String, dynamic> latestSeen);
 
-  // TODO: Implement this method in the main class
   // Future<void> sendEmailVerification();
 
   // Sends sign in email
@@ -34,7 +33,7 @@ abstract class BaseAuth {
   // Sign out the user
   Future<void> signOut();
 
-  // TODO: Implement this method in the main class
+  
   // Future<bool> isEmailVerified();
 }
 

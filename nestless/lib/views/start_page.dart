@@ -53,7 +53,6 @@ class _StartPageState extends State<StartPage> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: could be an introduction screen instead of a basic scaffold
 
     // Get the device width
     final double deviceWidth = MediaQuery.of(context).size.width;
@@ -61,7 +60,6 @@ class _StartPageState extends State<StartPage> {
     return Scaffold(
         body: SizedBox(
           width: double.infinity,
-          // TODO: this could be refactored to use a single widget
           child: Stack(
             children: [
               Positioned(
