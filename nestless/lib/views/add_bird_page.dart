@@ -194,13 +194,6 @@ class _AddBirdPageState extends State<AddBirdPage> {
     });
   }
 
-  // pulling all data we just need one data
-  void queryData() async {
-    var querySnap = await user.doc(widget.uid).get();
-
-    setState(() {});
-  }
-
   addData(var data) async {
     var querySnap = await user.doc(widget.uid).get();
 

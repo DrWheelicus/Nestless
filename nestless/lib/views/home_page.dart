@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage> {
         onSignOut: widget.onSignedOut,
         userId: widget.userId,
         onSignIn: widget.onSignedIn,
-        hasSignOut: true,
+        hasSignOut: false,
         hasBack: false,
       ),
       body: Center(
