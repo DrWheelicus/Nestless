@@ -1,11 +1,8 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
-
-import 'package:nestless/views/search_page.dart';
 
 var birdLocation = [];
 
@@ -155,13 +152,12 @@ class _BirdLocationPageState extends State<BirdLocationPage> {
                       var userLocation =
                           LatLng(userCoords.latitude, userCoords.longitude);
                       setState(() {
-                        myLocation; //= userLocation;
+                        // myLocation = userLocation;
                         if (myLocation !=
                             LatLng(43.86567452537625, -79.19257823567597)) {
                           markerList.removeLast();
                         }
                         markerList.add(
-                          //use this instead of circlelayeroptions
                           Marker(
                               point: myLocation,
                               builder: (BuildContext context) {

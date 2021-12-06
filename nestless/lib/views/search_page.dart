@@ -90,13 +90,20 @@ class _SearchPageState extends State<SearchPage> {
                     child: GridTile(
                         child: GestureDetector(
                             onTap: () => {
-                              if (selectedBirds[i]['location'] != null){
-                                //! Add map page below and uncomment block
-                                //! If bird info needed use selectedBirds[i]
-                                Navigator.push(context, MaterialPageRoute(
-                                  builder: (context) => BirdLocationPage(selectedBirds[i])))
-                              } else {_showAlertDialog(context)}
-                            },
+                                  if (selectedBirds[i]['location'] != null)
+                                    {
+                                      //! Add map page below and uncomment block
+                                      //! If bird info needed use selectedBirds[i]
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  BirdLocationPage(
+                                                      selectedBirds[i])))
+                                    }
+                                  else
+                                    {_showAlertDialog(context)}
+                                },
                             child: Column(children: [
                               Image.network(
                                 selectedBirds[i]['image'],
@@ -168,7 +175,7 @@ class _SearchPageState extends State<SearchPage> {
       selectedBirds = List.from(selectedBirds.reversed);
     }
   }
-  
+
   _showAlertDialog(BuildContext context) {
     return showDialog(
         context: context,
@@ -178,10 +185,12 @@ class _SearchPageState extends State<SearchPage> {
             content: Text("No Locations Found"),
             actions: [
               TextButton(
-                  onPressed: () {	
+                  onPressed: () {
                     return Navigator.pop(context);
                   },
-                  child: Text("OK", style: TextStyle(fontSize: 20, color: Colors.purpleAccent))),
+                  child: Text("OK",
+                      style:
+                          TextStyle(fontSize: 20, color: Colors.purpleAccent))),
             ],
           );
         }).then((value) {

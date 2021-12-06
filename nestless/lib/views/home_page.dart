@@ -53,7 +53,6 @@ class _HomePageState extends State<HomePage> {
         userId: widget.userId,
         onSignedOut: widget.onSignedOut,
         onSignedIn: widget.onSignedIn,
-
       ),
     ];
     return Scaffold(

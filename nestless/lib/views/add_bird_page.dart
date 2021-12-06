@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:nestless/services/authentication.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class Bird {
   String name;
@@ -40,7 +39,7 @@ class AddBirdPage extends StatefulWidget {
 class _AddBirdPageState extends State<AddBirdPage> {
   final nameController = TextEditingController();
   final sNameController = TextEditingController();
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final user = FirebaseFirestore.instance.collection('user');
 
   dynamic selectedStat;
   dynamic selectedImg;
@@ -196,14 +195,30 @@ class _AddBirdPageState extends State<AddBirdPage> {
   }
 
   // pulling all data we just need one data
-  void createUserList() async {
-    var querySnap = await FirebaseFirestore.instance
-        .collection('user')
-        .doc(widget.uid)
-        .get();
+  void queryData() async {
+    var querySnap = await user.doc(widget.uid).get();
 
-    setState(() {
-      print(querySnap['email']);
+    setState(() {});
+  }
+
+  addData(var data) async {
+    var querySnap = await user.doc(widget.uid).get();
+
+    querySnap['birdsSeen'].add({
+      'commonName': data['commonName'],
+      'image': data['image'],
+      'sciName': data['sciName'],
+      'status': data['status']
+    });
+  }
+
+  updateData(var data) async {
+    var querySnap = await user.doc(widget.uid);
+
+    querySnap.update({
+      'latestSeen.commonName': data['commonName'],
+      'latestSeen.sciName': data['sciName'],
+      'latestSeen.status': data['status']
     });
   }
 
@@ -226,13 +241,12 @@ class _AddBirdPageState extends State<AddBirdPage> {
               Container(width: 50),
               TextButton(
                   onPressed: () async {
-                    // save and upload data to firebase
                     birdList = (Bird(nameController.text, sNameController.text,
                             selectedStat, selectedImg.toString())
                         .toMap());
 
-                    createUserList();
-                    setState(() {});
+                    addData(birdList);
+                    updateData(birdList);
 
                     return Navigator.pop(context);
                   },

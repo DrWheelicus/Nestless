@@ -18,9 +18,8 @@ class ProfilePage extends StatefulWidget {
   _ProfilePageState createState() => _ProfilePageState();
 }
 
-
 class _ProfilePageState extends State<ProfilePage> {
-  String? username;  
+  String? username;
   String? email;
   String? photoURL;
   String? uid;
@@ -28,18 +27,16 @@ class _ProfilePageState extends State<ProfilePage> {
   String? image;
   int points = 0;
   List<Map<String, dynamic>> birdsSeen = [];
-  Map<String, dynamic> latestSeen = {}; 
+  Map<String, dynamic> latestSeen = {};
   String? profilePictureURL;
   final profilePictureURLController = TextEditingController();
   final userNameController = TextEditingController();
   final users = FirebaseFirestore.instance.collection('users');
-  
-  
+
   @override
   void initState() {
     super.initState();
     getSeenBirds();
-      
   }
 
   @override
@@ -130,7 +127,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 width: 200,
                 child: TextField(
                   controller: userNameController,
-
                   onSubmitted: (String? value) {
                     updateUsername(value.toString());
                   },
@@ -183,7 +179,6 @@ class _ProfilePageState extends State<ProfilePage> {
           Container(
             width: MediaQuery.of(context).size.width - 25,
             height: 150,
-
             child: Row(children: [
               Image.network(
                 latestSeen['image'],
@@ -193,8 +188,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   return const Image(
                       width: 200,
                       image: AssetImage(
-                    'assets/images/bird-error.jpg',
-                  ));
+                        'assets/images/bird-error.jpg',
+                      ));
                 },
               ),
               Column(
@@ -233,7 +228,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 pointCalc(),
                 style: const TextStyle(fontSize: 15),
               )
-            ],),
+            ],
+          ),
           const SizedBox(
             height: 5,
           ),
@@ -250,36 +246,45 @@ class _ProfilePageState extends State<ProfilePage> {
                     return Card(
                         child: GridTile(
                             child: GestureDetector(
-                            onTap: () => {
-                              if (birdsSeen[i]['location'] != null){
-                                Navigator.push(context, MaterialPageRoute(
-                                  builder: (context) => BirdLocationPage(birdsSeen[i])))
-                              } else {_showAlertDialog(context)}
-                            },
-                          child: Column(children: [
-                            Image.network(
-                              birdsSeen[i]['image'],
-                              height: 105,
-                              errorBuilder: (BuildContext context, Object exception,
-                                  StackTrace? stackTrace) {
-                                return const Image(
-                                    image: AssetImage(
-                                  'assets/images/bird-error.jpg',
-                                ));
-                              },
-                            ),
-                            Text(
-                              birdName,
-                              style: TextStyle(
-                                  color: Colors.deepPurpleAccent[100],
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              birdsSeen[i]['status'],
-                              style: const TextStyle(fontStyle: FontStyle.italic),
-                            ),
-                          ]))));
+                                onTap: () => {
+                                      if (birdsSeen[i]['location'] != null)
+                                        {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      BirdLocationPage(
+                                                          birdsSeen[i])))
+                                        }
+                                      else
+                                        {_showAlertDialog(context)}
+                                    },
+                                child: Column(children: [
+                                  Image.network(
+                                    birdsSeen[i]['image'],
+                                    height: 105,
+                                    errorBuilder: (BuildContext context,
+                                        Object exception,
+                                        StackTrace? stackTrace) {
+                                      return const Image(
+                                          image: AssetImage(
+                                        'assets/images/bird-error.jpg',
+                                      ));
+                                    },
+                                  ),
+                                  Text(
+                                    birdName,
+                                    style: TextStyle(
+                                        color: Colors.deepPurpleAccent[100],
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    birdsSeen[i]['status'],
+                                    style: const TextStyle(
+                                        fontStyle: FontStyle.italic),
+                                  ),
+                                ]))));
                   }))
         ]),
       ),
@@ -291,31 +296,27 @@ class _ProfilePageState extends State<ProfilePage> {
         .collection('user')
         .doc(widget.uid)
         .get();
-    
-    birdsSeen=[];
+
+    birdsSeen = [];
     setState(() {
-      for(int i =0; i < querySnap['birdsSeen'].length; i++){
+      for (int i = 0; i < querySnap['birdsSeen'].length; i++) {
         birdsSeen.add(querySnap['birdsSeen'][i]);
-      } 
-      
+      }
     });
   }
 
-  String pointCalc(){
+  String pointCalc() {
     points = 0;
 
-    for(int i = 0; i < birdsSeen.length; i++){
+    for (int i = 0; i < birdsSeen.length; i++) {
       String rarityString = birdsSeen[i]['status'].split(" ")[0];
-      if(rarityString == 'common'){
+      if (rarityString == 'common') {
         points += 30;
-      }
-      else if(rarityString == 'uncommon'){
+      } else if (rarityString == 'uncommon') {
         points += 75;
-      }
-      else if(rarityString == 'irregular'){
+      } else if (rarityString == 'irregular') {
         points += 150;
       }
-
     }
 
     return points.toString();
@@ -328,39 +329,36 @@ class _ProfilePageState extends State<ProfilePage> {
     return name;
   }
 
-
   void getUserInfo() async {
     var querySnap = await FirebaseFirestore.instance
         .collection('user')
         .doc(widget.uid)
         .get();
-    
+
     username = querySnap['username'];
     email = querySnap['email'];
     photoURL = querySnap['photoURL'];
     latestSeen = querySnap['latestSeen'];
     latestCommon = querySnap['latestSeen']['commonName'];
-
   }
 
-  void updateURL(String URL) async{
-      await FirebaseFirestore.instance
+  void updateURL(String URL) async {
+    await FirebaseFirestore.instance
         .collection('user')
         .doc(widget.uid)
         .update({'photoURL': URL});
-      setState(() {
-        
-      });
-    }
+    setState(() {});
+  }
+
   void updateUsername(String username) async {
-      await FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection('user')
         .doc(widget.uid)
         .update({'username': username});
-    
-    setState((){
-    });
+
+    setState(() {});
   }
+
   _showAlertDialog(BuildContext context) {
     return showDialog(
         context: context,
@@ -370,10 +368,12 @@ class _ProfilePageState extends State<ProfilePage> {
             content: const Text("No Locations Found"),
             actions: [
               TextButton(
-                  onPressed: () {	
+                  onPressed: () {
                     return Navigator.pop(context);
                   },
-                  child: const Text("OK", style: TextStyle(fontSize: 20, color: Colors.purpleAccent))),
+                  child: const Text("OK",
+                      style:
+                          TextStyle(fontSize: 20, color: Colors.purpleAccent))),
             ],
           );
         }).then((value) {
@@ -383,9 +383,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   // ignore: must_call_super
-  void dispose(){
+  void dispose() {
     userNameController.dispose();
     profilePictureURLController.dispose();
   }
-  
 }
