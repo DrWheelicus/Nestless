@@ -18,20 +18,17 @@ class ProfilePage extends StatefulWidget {
   _ProfilePageState createState() => _ProfilePageState();
 }
 
-//Profile Picture URL, List of seen birds, Username, Email, Latest Seen bird
-//Load page -> Get specific user from db -> whenever an edit is made, call a function that edits in firebase.
 
 class _ProfilePageState extends State<ProfilePage> {
   String? username;  
-  // var querySnap;
   String? email;
   String? photoURL;
   String? uid;
   String? latestCommon;
   String? image;
   int points = 0;
-  List<Map<String, dynamic>> birds = [];
-  Map<String, dynamic> latestSeen = {};
+  List<Map<String, dynamic>> birdsSeen = [];
+  Map<String, dynamic> latestSeen = {}; 
   String? profilePictureURL;
   final profilePictureURLController = TextEditingController();
   final userNameController = TextEditingController();
@@ -41,7 +38,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    createBirdList();
+    getSeenBirds();
       
   }
 
@@ -49,7 +46,6 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     getUserInfo();
     pointCalc();
-    // image = checkImage(latestSeen['image']); 
 
     return Scaffold(
         body: Container(
@@ -137,14 +133,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
                   onSubmitted: (String? value) {
                     updateUsername(value.toString());
-                    // username = userNameController.text;
                   },
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),
                     contentPadding: const EdgeInsets.all(5.0),
                     hintText: username,
                   ),
-                  // readOnly: true,
                 ),
               ),
               const SizedBox(
@@ -187,12 +181,9 @@ class _ProfilePageState extends State<ProfilePage> {
             height: 5,
           ),
           Container(
-            // padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
             width: MediaQuery.of(context).size.width - 25,
             height: 150,
-            // decoration: BoxDecoration(
-            //   border: Border.all(color: Colors.black)
-            // ),
+
             child: Row(children: [
               Image.network(
                 latestSeen['image'],
@@ -206,7 +197,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   ));
                 },
               ),
-              // Image.network(latestSeen['image'].toString() ?? 'assets/images/bird-error.jpg'),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -254,21 +244,21 @@ class _ProfilePageState extends State<ProfilePage> {
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2),
                   scrollDirection: Axis.vertical,
-                  itemCount: birds.length,
+                  itemCount: birdsSeen.length,
                   itemBuilder: (BuildContext context, int i) {
-                    String birdName = constrainName(birds[i]['commonName']);
+                    String birdName = constrainName(birdsSeen[i]['commonName']);
                     return Card(
                         child: GridTile(
                             child: GestureDetector(
                             onTap: () => {
-                              if (birds[i]['location'] != null){
+                              if (birdsSeen[i]['location'] != null){
                                 Navigator.push(context, MaterialPageRoute(
-                                  builder: (context) => BirdLocationPage(birds[i])))
+                                  builder: (context) => BirdLocationPage(birdsSeen[i])))
                               } else {_showAlertDialog(context)}
                             },
                           child: Column(children: [
                             Image.network(
-                              birds[i]['image'],
+                              birdsSeen[i]['image'],
                               height: 105,
                               errorBuilder: (BuildContext context, Object exception,
                                   StackTrace? stackTrace) {
@@ -286,7 +276,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              birds[i]['status'],
+                              birdsSeen[i]['status'],
                               style: const TextStyle(fontStyle: FontStyle.italic),
                             ),
                           ]))));
@@ -296,25 +286,30 @@ class _ProfilePageState extends State<ProfilePage> {
     ));
   }
 
-  void createBirdList() async {
-    // User? user = await widget.auth.getCurrentUser();
-    QuerySnapshot<Map<String, dynamic>> querySnap =
-        await FirebaseFirestore.instance.collection('birds').get();
+  void getSeenBirds() async {
+    var querySnap = await FirebaseFirestore.instance
+        .collection('user')
+        .doc(widget.uid)
+        .get();
     
-
+    birdsSeen=[];
+    print("Birds");
+    print(birdsSeen);
     setState(() {
-      for (var docSnap in querySnap.docs) {
-        birds.add(docSnap.data());
-      }
-
+      for(int i =0; i < querySnap['birdsSeen'].length; i++){
+        birdsSeen.add(querySnap['birdsSeen'][i]);
+      } 
+      
     });
   }
 
   String pointCalc(){
+    print("These are birds");
+    print(birdsSeen);
     points = 0;
 
-    for(int i = 0; i < birds.length; i++){
-      String rarityString = birds[i]['status'].split(" ")[0];
+    for(int i = 0; i < birdsSeen.length; i++){
+      String rarityString = birdsSeen[i]['status'].split(" ")[0];
       if(rarityString == 'common'){
         points += 30;
       }
@@ -337,14 +332,6 @@ class _ProfilePageState extends State<ProfilePage> {
     return name;
   }
 
-  // String checkImage(latestSeen){
-  //   if(latestSeen != null) {
-  //     return latestSeen['image'];
-  //   }
-  //   else{
-  //     return 'assets/images/bird-error.jpg';
-  //   }
-  // }
 
   void getUserInfo() async {
     var querySnap = await FirebaseFirestore.instance
@@ -353,31 +340,23 @@ class _ProfilePageState extends State<ProfilePage> {
         .get();
     print(querySnap['latestSeen']);
     print(widget.uid);
-    //for (var docSnap in querySnap.docs) {
     print(querySnap['email']);
+    print("TotalBirds");
+    print(querySnap['birdsSeen']);
     
     username = querySnap['username'];
     email = querySnap['email'];
     photoURL = querySnap['photoURL'];
     latestSeen = querySnap['latestSeen'];
     latestCommon = querySnap['latestSeen']['commonName'];
-    // print(latestCommon['commonName']);
+
     print(latestCommon);
+    int counter=0;
+    
 
     
     print("Pass1");
-    // var userDetails = await users.doc(widget.uid).get();
-    // User? user = await widget.auth.getCurrentUser();
-    // // email = user!.email;
-    // uid = user!.uid;
 
-    // username = user.displayName;
-    // photoURL = user.photoURL;
-    // latestSeen = birds[0];
-    // user.
-    // print(latestSeen['commonName']);
-    // username = userDetails['username'];
-    // profilePictureURL = userDetails['url'];
   }
 
   void updateURL(String URL) async{
@@ -398,15 +377,7 @@ class _ProfilePageState extends State<ProfilePage> {
     setState((){
     });
     
-    // querySnap.data().update(widget.uid, (value) => username, update);
-    //for (var docSnap in querySnap.docs) {
-    // username = querySnap['username'];
-      print("Test");
-
-
-
-    // User? user = await widget.auth.getCurrentUser();
-    // user!.updateDisplayName(username);
+    print("Test");
   }
   _showAlertDialog(BuildContext context) {
     return showDialog(
@@ -428,10 +399,11 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
-  // @override
-  // // ignore: must_call_super
-  // void dispose(){
-  //   userNameController.dispose();
-  //   profilePictureURLController.dispose();
-  // }
+  @override
+  // ignore: must_call_super
+  void dispose(){
+    userNameController.dispose();
+    profilePictureURLController.dispose();
+  }
+  
 }
