@@ -84,7 +84,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                   Padding(
-                                    padding: EdgeInsets.all(8.0),
+                                    padding: const EdgeInsets.all(8.0),
                                     child: TextField(
                                       controller: profilePictureURLController,
                                       decoration: const InputDecoration(
@@ -293,8 +293,6 @@ class _ProfilePageState extends State<ProfilePage> {
         .get();
     
     birdsSeen=[];
-    print("Birds");
-    print(birdsSeen);
     setState(() {
       for(int i =0; i < querySnap['birdsSeen'].length; i++){
         birdsSeen.add(querySnap['birdsSeen'][i]);
@@ -304,8 +302,6 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   String pointCalc(){
-    print("These are birds");
-    print(birdsSeen);
     points = 0;
 
     for(int i = 0; i < birdsSeen.length; i++){
@@ -338,24 +334,12 @@ class _ProfilePageState extends State<ProfilePage> {
         .collection('user')
         .doc(widget.uid)
         .get();
-    print(querySnap['latestSeen']);
-    print(widget.uid);
-    print(querySnap['email']);
-    print("TotalBirds");
-    print(querySnap['birdsSeen']);
     
     username = querySnap['username'];
     email = querySnap['email'];
     photoURL = querySnap['photoURL'];
     latestSeen = querySnap['latestSeen'];
     latestCommon = querySnap['latestSeen']['commonName'];
-
-    print(latestCommon);
-    int counter=0;
-    
-
-    
-    print("Pass1");
 
   }
 
@@ -376,22 +360,20 @@ class _ProfilePageState extends State<ProfilePage> {
     
     setState((){
     });
-    
-    print("Test");
   }
   _showAlertDialog(BuildContext context) {
     return showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Location Error"),
-            content: Text("No Locations Found"),
+            title: const Text("Location Error"),
+            content: const Text("No Locations Found"),
             actions: [
               TextButton(
                   onPressed: () {	
                     return Navigator.pop(context);
                   },
-                  child: Text("OK", style: TextStyle(fontSize: 20, color: Colors.purpleAccent))),
+                  child: const Text("OK", style: TextStyle(fontSize: 20, color: Colors.purpleAccent))),
             ],
           );
         }).then((value) {
