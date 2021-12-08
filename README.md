@@ -1,3 +1,12 @@
+**For Professor Iqbal**
+Because of a private matter with the member involved with setting up the databases, we were unable to get a consistent login paired with the user data.
+So for demonstrational purposes, please use this login information:
+Email: colinator0@hotmail.com
+Password:    Banana
+
+
+
+
 # Final Project CSCI 4100U
 
 ## Overview
